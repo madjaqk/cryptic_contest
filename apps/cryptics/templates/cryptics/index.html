@@ -39,10 +39,12 @@ Puzzlers Club Cryptic Clue Contests
 	
 	<p><strong>The current champion is {{ current_champ.user }}, with {{ current_champ.contests_won }} wins!  All hail {{ current_champ.user }}!</strong>  <a href="{% url 'cryptics:all_users' %}">Full stats</a></p>
 
-	<h3>Past Contests</h3>
-	<ul>
-		{% for contest in past_contests %}
-			<li><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></li>
-		{% endfor %}
-	</ul>
+	{% if past_contests %}
+		<h3>Past Contests</h3>
+		<ul>
+			{% for contest in past_contests %}
+				<li><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
 {% endblock content %}

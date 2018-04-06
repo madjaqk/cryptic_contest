@@ -19,8 +19,8 @@ class Contest(models.Model):
 	active = models.BooleanField(default=True)
 	started_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contests_started")
 
-	winning_entry = models.OneToOneField("Submission", on_delete=models.CASCADE, related_name="contest_this_won", null=True)
-	winning_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contests_won", null=True)
+	winning_entry = models.OneToOneField("Submission", on_delete=models.CASCADE, related_name="contest_this_won", null=True, blank=True)
+	winning_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contests_won", null=True, blank=True)
 
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)

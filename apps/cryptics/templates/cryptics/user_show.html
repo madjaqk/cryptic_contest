@@ -25,6 +25,7 @@
 	{% if this_user.submissions.exists %}
 		<table>
 			<tr>
+				<th>Clue ID</th>
 				<th>Contest</th>
 				<th>Clue</th>
 				<th>Explanation</th>
@@ -33,6 +34,7 @@
 			</tr>
 			{% for sub in this_user.submissions.all|dictsort:"sort_order" %}
 				<tr class="{% cycle 'row1' 'row2' %}">
+					<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_user' user.id %}#clue{{sub.id}}">{{sub.id}}</td>
 					<td>{{sub.contest.word}}</td>
 					<td>{{sub.clue}}</td>
 					<td>{{sub.explanation|linebreaks}}</td>

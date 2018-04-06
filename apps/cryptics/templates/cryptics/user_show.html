@@ -35,7 +35,7 @@
 				<tr class="{% cycle 'row1' 'row2' %}">
 					<td>{{sub.contest.word}}</td>
 					<td>{{sub.clue}}</td>
-					<td>{{sub.explanation}}</td>
+					<td>{{sub.explanation|linebreaks}}</td>
 					<td>{{sub.submitted_by}}</td>
 					<td>{{sub.likers.count}}</td>
 					{% if user.is_authenticated %}

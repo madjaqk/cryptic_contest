@@ -37,7 +37,7 @@
 			{% for sub in contest.submissions.all|dictsort:"sort_order" %}
 				<tr class="{% cycle 'row1' 'row2' %}">
 					<td>{{sub.clue}}</td>
-					<td>{{sub.explanation}}</td>
+					<td>{{sub.explanation|linebreaks}}</td>
 					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a></td>
 					<td>{{sub.likers.count}}</td>
 					{% if user.is_authenticated %}

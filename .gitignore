@@ -1,0 +1,6 @@
+*.py[cod]
+__pycache__
+db.sqlite3
+.env
+django_env
+/static

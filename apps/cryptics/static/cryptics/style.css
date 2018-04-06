@@ -1,0 +1,30 @@
+#header {
+	font-style: italic;
+	border-bottom: 1px solid black;
+	padding-bottom: 5px;
+	text-align: right;
+}
+
+.row1 {
+	background-color: white;
+}
+
+.row2 {
+	background-color: #DDDDDD;
+}
+
+.like_star {
+	width: 20px;
+	height: 20px;
+}
+
+.winner_box {
+	text-align: center;
+	background-color: #FFFACD;
+}
+
+.winner {
+	font-weight: bold;
+	font-style: italic;
+	font-size: 1.2em;
+}

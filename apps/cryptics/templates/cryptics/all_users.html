@@ -1,0 +1,28 @@
+{% extends "./base.html" %}
+
+{% block title %}
+	Puzzlers Club Cryptic Clue Contests -- All Users
+{% endblock title %}
+
+{% block content %}
+	<h1>All Users</h1>
+	<table>
+		<tr>
+			<th>Username</th>
+			<th>Contests Won</th>
+			<th>Average Likes Per Submission</th>
+			<th>Total Submissions</th>
+			<th>Total Likes</th>
+		</tr>
+		{% for user in users %}
+			<tr class="{% cycle 'row1' 'row2' %}">
+				<td> <a href="{% url 'cryptics:show_user' user.user.id %}">{{ user.user.username }}</a></td>
+				<td>{{ user.contests_won }}</td>
+				<td>{{ user.average_likes }}</td>
+				<td>{{ user.total_submissions }}</td>
+				<td>{{ user.total_likes }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	<p><a href="{% url 'cryptics:index' %}">Back</a></p>
+{% endblock content %}

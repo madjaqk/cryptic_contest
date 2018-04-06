@@ -1,0 +1,67 @@
+{% extends "./base.html" %}
+
+{% block title %}
+	Cryptic Contest: {{ contest.word }}
+{% endblock title %}
+
+{% block content %}
+	{% load static %}
+
+	<h1>{{contest.word}}</h1>
+	{% if contest.active %}
+		<form action="{% url 'cryptics:create_submission' %}" method="post">
+			{% csrf_token %}
+			<input type="hidden" name="contest_id" value="{{ contest.id }}">
+			<p>Clue: <input type="text" name="clue" width=600></p>
+			<p>Explanation:</p> 
+			<p><textarea rows=4 cols=40 name="explanation"></textarea></p>
+			<input type="submit" value="Submit">
+		</form>
+	{% endif %}
+	{% if contest.winning_entry %}
+		<div class="winner_box">
+			<p class="winner">{{ contest.winning_entry.clue }}</p>
+			<p>{{ contest.winning_entry.explanation }}</p>
+			<p>Submitted by {{ contest.winning_entry.submitted_by }}</p>
+		</div>
+	{% endif %}
+	<h3>All Submissions</h3>
+	{% if contest.submissions.exists %}
+		<table>
+			<tr>
+				<th>Clue</th>
+				<th>Explanation</th>
+				<th>Submitted By</th>
+				<th>Likes</th>
+			</tr>
+			{% for sub in contest.submissions.all|dictsort:"sort_order" %}
+				<tr class="{% cycle 'row1' 'row2' %}">
+					<td>{{sub.clue}}</td>
+					<td>{{sub.explanation}}</td>
+					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a></td>
+					<td>{{sub.likers.count}}</td>
+					{% if user.is_authenticated %}
+						<td>
+							{% if user in sub.likers.all %}
+								{% if contest.active %}
+									<a href="{% url 'cryptics:remove_like' sub.id %}"><img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star"></a>
+								{% else %}
+									<img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star">
+								{% endif %}
+							{% else %}
+								{% if contest.active %}
+									<a href="{% url 'cryptics:add_like' sub.id %}"><img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star"></a>
+								{% else %}
+									<img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star">
+								{% endif %}
+							{% endif %}
+						</td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<p>Sorry, none yet. {% if contest.active %}Be the first!{% endif %} </p>
+	{% endif %}
+	<a href="{% url 'cryptics:index' %}">Back</a>
+{% endblock content %}

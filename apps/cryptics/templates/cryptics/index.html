@@ -1,0 +1,48 @@
+{% extends "./base.html" %}
+
+{% block title %}
+Puzzlers Club Cryptic Clue Contests
+{% endblock title %}
+
+{% block content %}
+	{% load humanize %}
+
+	<h1>Cryptics</h1>
+	
+	<h3>New Contest</h3>
+	<form action="{% url 'cryptics:create_contest' %}" method="post">
+		{% csrf_token %}
+		<p>Word: <input type="text" name="word"></p>
+		<input type="submit" value="Create Contest">
+	</form>
+
+
+	{% if open_contests %}
+		<h3>Contests</h3>
+		<table>
+			<tr>
+				<th>Word</th>
+				<th>Ends...</th>
+				<th>Submitted By</th>
+			</tr>
+			{% for contest in open_contests %}
+				<tr class="{% cycle 'row1' 'row2' %}">
+					<td><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></td>
+					<td>{{contest.end_time|naturaltime}}</td>
+					<td><a href="{% url 'cryptics:show_user' contest.started_by.id %}">{{contest.started_by}}</a></td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<p>No open contests currently. {% if user.is_authenticated %}Start one!{% endif %}</p>
+	{% endif %}
+	
+	<p><strong>The current champion is {{ current_champ.user }}, with {{ current_champ.contests_won }} wins!  All hail {{ current_champ.user }}!</strong>  <a href="{% url 'cryptics:all_users' %}">Full stats</a></p>
+
+	<h3>Past Contests</h3>
+	<ul>
+		{% for contest in past_contests %}
+			<li><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock content %}

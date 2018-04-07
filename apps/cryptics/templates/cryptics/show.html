@@ -42,7 +42,7 @@
 					<td>{{sub.explanation|linebreaks}}</td>
 					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a></td>
 					<td>{{sub.likers.count}}</td>
-					{% if user.is_authenticated %}
+					{% if user.is_authenticated and user != sub.submitted_by %}
 						<td>
 							{% if user in sub.likers.all %}
 								{% if contest.active %}

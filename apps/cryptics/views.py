@@ -46,10 +46,12 @@ def create_submission(request):
 def add_like(request, submission_id):
 	submission = get_object_or_404(Submission, id=submission_id)
 	submission.contest.check_if_too_old()
-	if submission.contest.active:
-		submission.likers.add(request.user)
-	else:
+	if not submission.contest.active:
 		messages.error(request, "Sorry, this contest has closed")
+	elif request.user == submission.submitted_by:
+		messages.error(request, "Sorry, you can't vote for your own submissions")
+	else:
+		submission.likers.add(request.user)
 	return redirect("cryptics:show_contest", submission.contest.id)
 
 @login_required

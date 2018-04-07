@@ -75,7 +75,6 @@ class SubmissionManager(models.Manager):
 		else:
 			new_sub = Submission(clue=data["clue"], explanation=data["explanation"], contest=contest, submitted_by=user)
 			new_sub.save()
-			new_sub.likers.add(user)
 			return {"status": True}
 
 class Submission(models.Model):

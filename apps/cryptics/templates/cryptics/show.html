@@ -12,7 +12,7 @@
 		<form action="{% url 'cryptics:create_submission' %}" method="post">
 			{% csrf_token %}
 			<input type="hidden" name="contest_id" value="{{ contest.id }}">
-			<p>Clue: <input type="text" name="clue" width=600></p>
+			<p>Clue: <input type="text" name="clue" size="60"></p>
 			<p>Explanation:</p> 
 			<p><textarea rows=4 cols=40 name="explanation"></textarea></p>
 			<input type="submit" value="Submit">

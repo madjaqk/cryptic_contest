@@ -4,6 +4,7 @@ import threading
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.template.defaultfilters import pluralize
 
 CONTEST_LENGTH = datetime.timedelta(days=3)
 CONTEST_LENGTH_IN_SECONDS = CONTEST_LENGTH.days*24*60*60 + CONTEST_LENGTH.seconds
@@ -62,6 +63,17 @@ class SubmissionManager(models.Manager):
 			errors.append("No contest was specified (somehow)")
 		if not user:
 			errors.append("Must be logged in to submit a clue (this specific error shouldn't trigger)")
+
+		likes_needed_to_give = user.submissions.count() // 2 - user.clues_liked.count()
+
+		print("rate limiting?")
+		print("user.name", user.username, "user.submissions", user.submissions.count(), "user.clues_liked", user.clues_liked.count(), "likes_needed_to_give", likes_needed_to_give)
+
+		for sub in user.submissions.all():
+			print(sub.contest, sub.clue)
+
+		if likes_needed_to_give > 0:
+			errors.append(f"Please like at least {likes_needed_to_give} more clue{pluralize(likes_needed_to_give)}")
 
 		contest = Contest.objects.get(id=data["contest_id"])
 

@@ -66,12 +66,6 @@ class SubmissionManager(models.Manager):
 
 		likes_needed_to_give = user.submissions.count() // 2 - user.clues_liked.count()
 
-		print("rate limiting?")
-		print("user.name", user.username, "user.submissions", user.submissions.count(), "user.clues_liked", user.clues_liked.count(), "likes_needed_to_give", likes_needed_to_give)
-
-		for sub in user.submissions.all():
-			print(sub.contest, sub.clue)
-
 		if likes_needed_to_give > 0:
 			errors.append(f"Please like at least {likes_needed_to_give} more clue{pluralize(likes_needed_to_give)}")
 

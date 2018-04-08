@@ -10,6 +10,7 @@ def index(request):
 	context["open_contests"] = Contest.objects.filter(active=True)
 	context["past_contests"] = Contest.objects.filter(active=False)
 	context["current_champ"] = User.objects.sort_users()[0]
+	context["recent_clues"] = Submission.objects.all().order_by("-created_at")[:3]
 
 	return render(request, "cryptics/index.html", context)
 

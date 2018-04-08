@@ -98,6 +98,9 @@ class Submission(models.Model):
 	def sort_order(self):
 		return (-self.likers.count(), self.created_at)
 
+	def __str__(self):
+		return f"Submission: {self.clue}, by {self.submitted_by}"
+
 def sort_users():
 	# sort_users method to monkeypatch into User manager, because it's a built-in I don't have direct access to.
 	users = User.objects.all()

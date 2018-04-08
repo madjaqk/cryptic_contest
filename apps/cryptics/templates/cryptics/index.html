@@ -5,6 +5,7 @@ Puzzlers Club Cryptic Clue Contests
 {% endblock title %}
 
 {% block content %}
+	{% load static %}
 	{% load humanize %}
 
 	<h1>Cryptics</h1>
@@ -12,7 +13,7 @@ Puzzlers Club Cryptic Clue Contests
 	<h3>New Contest</h3>
 	<form action="{% url 'cryptics:create_contest' %}" method="post">
 		{% csrf_token %}
-		<p>Word: <input type="text" name="word"></p>
+		<p>Word: <input type="text" name="word" id="new_contest_word"> <a href="#" id="enumerate_link">Auto-enumerate</a> (beta)</p>
 		<input type="submit" value="Create Contest">
 	</form>
 	{% if open_contests %}
@@ -67,4 +68,6 @@ Puzzlers Club Cryptic Clue Contests
 			{% endfor %}
 		</ul>
 	{% endif %}
+
+	<script type="text/javascript" src="{% static 'cryptics/js/enumerate.js' %}"></script>
 {% endblock content %}

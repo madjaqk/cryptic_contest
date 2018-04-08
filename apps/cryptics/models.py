@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.template.defaultfilters import pluralize
 
-CONTEST_LENGTH = datetime.timedelta(days=3)
+CONTEST_LENGTH = datetime.timedelta(days=2)
 CONTEST_LENGTH_IN_SECONDS = CONTEST_LENGTH.days*24*60*60 + CONTEST_LENGTH.seconds
 
 class ContestManager(models.Manager):

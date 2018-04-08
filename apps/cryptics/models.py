@@ -37,7 +37,7 @@ class Contest(models.Model):
 
 	def declare_winner(self):
 		if self.submissions.exists():
-			winning_entry = self.submissions.annotate(likes=models.Count("likers")).order_by("-likers", "created_at").first()
+			winning_entry = self.submissions.annotate(likes=models.Count("likers")).order_by("-likes", "created_at").first()
 			self.winning_entry = winning_entry
 			self.winning_user = winning_entry.submitted_by
 			self.save()

@@ -26,6 +26,7 @@ def create_contest(request):
 def show_contest(request, contest_id):
 	contest = get_object_or_404(Contest, id=contest_id)
 	contest.check_if_too_old()
+
 	return render(request, "cryptics/show.html", {"contest": contest})	
 
 @login_required

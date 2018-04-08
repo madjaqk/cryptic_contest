@@ -52,7 +52,7 @@ Puzzlers Club Cryptic Clue Contests
 				<tr class="{% cycle 'row1' 'row2' %}">
 					<td><a href="{% url 'cryptics:show_contest' sub.contest.id %}">{{sub.contest.word}}</td>
 					<td>{{sub.clue}}</td>
-					<td>{{sub.explanation|linebreaks}}</td>
+					<td>{{sub.explanation|linebreaksbr}}</td>
 					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a> ({{sub.created_at|naturaltime}})</td>
 				</tr>
 			{% endfor %}

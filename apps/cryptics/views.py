@@ -54,7 +54,11 @@ def add_like(request, submission_id):
 		messages.error(request, "Sorry, you can't vote for your own submissions")
 	else:
 		submission.likers.add(request.user)
-	return redirect("cryptics:show_contest", submission.contest.id)
+
+	if "next" in request.GET:
+		return redirect(request.GET["next"])
+	else:
+		return redirect("cryptics:show_contest", submission.contest.id)
 
 @login_required
 def remove_like(request, submission_id):
@@ -64,7 +68,11 @@ def remove_like(request, submission_id):
 		submission.likers.remove(request.user)
 	else:
 		messages.error(request, "Sorry, this contest has closed")	
-	return redirect("cryptics:show_contest", submission.contest.id)
+	
+	if "next" in request.GET:
+		return redirect(request.GET["next"])
+	else:
+		return redirect("cryptics:show_contest", submission.contest.id)
 
 def all_users(request):
 	return render(request, "cryptics/all_users.html", {"users": User.objects.sort_users()})

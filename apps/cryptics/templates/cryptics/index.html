@@ -37,7 +37,7 @@ Puzzlers Club Cryptic Clue Contests
 		<p>No open contests currently. {% if user.is_authenticated %}Start one!{% endif %}</p>
 	{% endif %}
 	<hr>
-	<p><strong>The current champion is {{ current_champ.user }}, with {{ current_champ.contests_won }} wins!  All hail {{ current_champ.user }}!</strong>  <a href="{% url 'cryptics:all_users' %}">Full stats</a></p>
+	<p><strong>The current champion is {{ current_champ.user }}, with {{ current_champ.contests_won }} win{{ current_champ.contests_won|pluralize }}!  All hail {{ current_champ.user }}!</strong>  <a href="{% url 'cryptics:all_users' %}">Full stats</a></p>
 	{% if recent_clues %}
 		<hr>
 		<h3>Recent Clues</h3>

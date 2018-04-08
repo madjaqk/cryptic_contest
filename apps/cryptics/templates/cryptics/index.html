@@ -15,9 +15,8 @@ Puzzlers Club Cryptic Clue Contests
 		<p>Word: <input type="text" name="word"></p>
 		<input type="submit" value="Create Contest">
 	</form>
-
-
 	{% if open_contests %}
+		<hr>
 		<h3>Contests</h3>
 		<table>
 			<tr>
@@ -36,10 +35,10 @@ Puzzlers Club Cryptic Clue Contests
 	{% else %}
 		<p>No open contests currently. {% if user.is_authenticated %}Start one!{% endif %}</p>
 	{% endif %}
-	
+	<hr>
 	<p><strong>The current champion is {{ current_champ.user }}, with {{ current_champ.contests_won }} wins!  All hail {{ current_champ.user }}!</strong>  <a href="{% url 'cryptics:all_users' %}">Full stats</a></p>
-
 	{% if recent_clues %}
+		<hr>
 		<h3>Recent Clues</h3>
 		<table>
 			<tr>
@@ -60,6 +59,7 @@ Puzzlers Club Cryptic Clue Contests
 	{% endif %}
 
 	{% if past_contests %}
+		<hr>
 		<h3>Past Contests</h3>
 		<ul>
 			{% for contest in past_contests %}

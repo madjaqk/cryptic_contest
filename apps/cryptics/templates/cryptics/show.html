@@ -41,7 +41,7 @@
 					<td>{{sub.clue}}</td>
 					<td>{{sub.explanation|linebreaksbr}}</td>
 					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a></td>
-					<td>{{sub.likers.count}}</td>
+					<td title="{{sub.likers.all|join:', '}}">{{sub.likers.count}}</td>
 					{% if user.is_authenticated and user != sub.submitted_by %}
 						<td>
 							{% if user in sub.likers.all %}

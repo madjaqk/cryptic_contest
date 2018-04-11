@@ -88,7 +88,7 @@ class Submission(models.Model):
 	explanation = models.TextField()
 	contest = models.ForeignKey(Contest, related_name="submissions", on_delete=models.CASCADE)
 	submitted_by = models.ForeignKey(User, related_name="submissions", on_delete=models.CASCADE)
-	likers = models.ManyToManyField(User, related_name="clues_liked")
+	likers = models.ManyToManyField(User, related_name="clues_liked", blank=True)
 
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -103,6 +103,7 @@ class Submission(models.Model):
 
 def sort_users():
 	# sort_users method to monkeypatch into User manager, because it's a built-in I don't have direct access to.
+	# The correct way to do this would have been a proxy model, but this works so not a pressing change.
 	users = User.objects.all()
 	users_list = []
 	for user in users:

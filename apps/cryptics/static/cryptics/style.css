@@ -21,6 +21,14 @@
 	color: #DDDDDD;
 }
 
+.row1 td.explanation:hover {
+	color: black;
+}
+
+.row2 td.explanation:hover {
+	color: black;
+}
+
 .like_star {
 	width: 20px;
 	height: 20px;

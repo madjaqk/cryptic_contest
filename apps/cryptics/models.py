@@ -88,7 +88,7 @@ class Submission(models.Model):
 	explanation = models.TextField()
 	contest = models.ForeignKey(Contest, related_name="submissions", on_delete=models.CASCADE)
 	submitted_by = models.ForeignKey(User, related_name="submissions", on_delete=models.CASCADE)
-	likers = models.ManyToManyField(User, related_name="clues_liked")
+	likers = models.ManyToManyField(User, related_name="clues_liked", blank=True)
 
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)

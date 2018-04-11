@@ -13,6 +13,14 @@
 	background-color: #DDDDDD;
 }
 
+.row1 td.explanation {
+	color: white;
+}
+
+.row2 td.explanation {
+	color: #DDDDDD;
+}
+
 .like_star {
 	width: 20px;
 	height: 20px;

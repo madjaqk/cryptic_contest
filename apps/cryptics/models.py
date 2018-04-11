@@ -103,6 +103,7 @@ class Submission(models.Model):
 
 def sort_users():
 	# sort_users method to monkeypatch into User manager, because it's a built-in I don't have direct access to.
+	# The correct way to do this would have been a proxy model, but this works so not a pressing change.
 	users = User.objects.all()
 	users_list = []
 	for user in users:

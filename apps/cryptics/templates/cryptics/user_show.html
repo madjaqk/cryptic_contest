@@ -34,7 +34,7 @@
 			</tr>
 			{% for sub in this_user.submissions.all|dictsort:"sort_order" %}
 				<tr class="{% cycle 'row1' 'row2' %}">
-					<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_user' user.id %}#clue{{sub.id}}">{{sub.id}}</td>
+					<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_user' this_user.id %}#clue{{sub.id}}">{{sub.id}}</td>
 					<td><a href="{% url 'cryptics:show_contest' sub.contest.id %}">{{sub.contest.word}}</a></td>
 					<td>{{sub.clue}}</td>
 					<td class="explanation">{{sub.explanation|linebreaksbr}}</td>

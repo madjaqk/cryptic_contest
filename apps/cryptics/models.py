@@ -6,22 +6,39 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.template.defaultfilters import pluralize
 
-CONTEST_LENGTH = datetime.timedelta(days=2, minutes=2)
-CONTEST_LENGTH_IN_SECONDS = CONTEST_LENGTH.days*24*60*60 + CONTEST_LENGTH.seconds
+def to_seconds(td):
+	return td.days*24*60*60 + td.seconds + td.microseconds
+
+# SUBMISSIONS_LENGTH = datetime.timedelta(days=2, minutes=2)
+# VOTING_LENGTH = datetime.timedelta(days=2, minutes=2)
+
+SUBMISSIONS_LENGTH = datetime.timedelta(minutes=10)
+VOTING_LENGTH = datetime.timedelta(minutes=10)
 
 class ContestManager(models.Manager):
 	def add(self, word, started_by):
 		new_contest = self.create(word=word.upper(), started_by=started_by)
-		t = threading.Timer(CONTEST_LENGTH_IN_SECONDS, new_contest.deactivate)
+		t = threading.Timer(to_seconds(SUBMISSIONS_LENGTH), new_contest.switch_to_voting)
 		t.start()
 
 class Contest(models.Model):
 	word = models.CharField(max_length=50)
-	active = models.BooleanField(default=True)
 	started_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contests_started")
 
 	winning_entry = models.OneToOneField("Submission", on_delete=models.CASCADE, related_name="contest_this_won", null=True, blank=True)
 	winning_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contests_won", null=True, blank=True)
+
+	SUBMISSIONS = "S"
+	VOTING = "V"
+	CLOSED = "C"
+
+	STATUS_CHOICES = (
+		(SUBMISSIONS, "submissions"),
+		(VOTING, "voting"),
+		(CLOSED, "closed"),
+	)
+
+	status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=SUBMISSIONS)
 
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -29,8 +46,27 @@ class Contest(models.Model):
 	objects = ContestManager()
 
 	@property
-	def end_time(self):
-		return self.created_at + CONTEST_LENGTH
+	def submissions_end_time(self):
+		if self.is_submissions:
+			return self.created_at + SUBMISSIONS_LENGTH
+
+	@property
+	def voting_end_time(self):
+		if self.is_voting or self.is_submissions:
+			return self.created_at + SUBMISSIONS_LENGTH + VOTING_LENGTH
+
+	# These properties are so that I can check status on templates without hardcoding in `contest.status == "S"` (or whatever)
+	@property
+	def is_submissions(self):
+		return self.status == self.SUBMISSIONS
+
+	@property
+	def is_voting(self):
+		return self.status == self.VOTING
+
+	@property
+	def is_closed(self):
+		return self.status == self.CLOSED
 
 	def __str__(self):
 		return f"Contest: {self.word}"
@@ -45,12 +81,22 @@ class Contest(models.Model):
 	def deactivate(self):
 		self.declare_winner()
 
-		self.active = False
+		self.status = self.CLOSED
 		self.save()
 
+	def switch_to_voting(self):
+		self.status = self.VOTING
+		self.save()
+		t = threading.Timer(to_seconds(VOTING_LENGTH), self.deactivate)
+		t.start()
+
 	def check_if_too_old(self):
-		if self.active and timezone.now() > self.end_time:
+		if self.is_closed:
+			return None
+		if timezone.now() > self.voting_end_time:
 			self.deactivate()
+		elif self.is_submissions and timezone.now() > self.submissions_end_time:
+			self.switch_to_voting()
 
 class SubmissionManager(models.Manager):
 	def add(self, data, user):
@@ -73,7 +119,7 @@ class SubmissionManager(models.Manager):
 
 		contest.check_if_too_old()
 
-		if not contest.active:
+		if not contest.is_submissions:
 			errors.append("Sorry, this contest has closed")
 
 		if errors:

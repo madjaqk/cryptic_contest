@@ -8,7 +8,7 @@
 	{% load static %}
 
 	<h1>{{contest.word}}</h1>
-	{% if contest.active %}
+	{% if contest.is_submissions %}
 		<form action="{% url 'cryptics:create_submission' %}" method="post">
 			{% csrf_token %}
 			<input type="hidden" name="contest_id" value="{{ contest.id }}">
@@ -33,7 +33,9 @@
 				<th>Clue</th>
 				<th>Explanation (highlight)</th>
 				<th>Submitted By</th>
-				<th>Likes</th>
+				{% if not contest.is_submissions %}
+					<th>Likes</th>
+				{% endif %}
 			</tr>
 			{% for sub in contest.submissions.all|dictsort:"sort_order" %}
 				<tr class="{% cycle 'row1' 'row2' %}">
@@ -41,20 +43,22 @@
 					<td>{{sub.clue}}</td>
 					<td class="explanation">{{sub.explanation|linebreaksbr}}</td>
 					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a></td>
-					<td title="{{sub.likers.all|join:', '}}">{{sub.likers.count}}</td>
-					{% if user.is_authenticated and user != sub.submitted_by %}
-						<td>
-							{% if user in sub.likers.all %}
-								{% if contest.active %}
-									<a href="{% url 'cryptics:remove_like' sub.id %}?next=/contest/{{contest.id}}"><img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star"></a>
+					{% if not contest.is_submissions %}
+						<td title="{{sub.likers.all|join:', '}}">{{sub.likers.count}}</td>
+						{% if user.is_authenticated and user != sub.submitted_by %}
+							<td>
+								{% if user in sub.likers.all %}
+									{% if contest.is_voting %}
+										<a href="{% url 'cryptics:remove_like' sub.id %}?next=/contest/{{contest.id}}"><img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star"></a>
+									{% else %}
+										<img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star">
+									{% endif %}
 								{% else %}
-									<img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star">
-								{% endif %}
-							{% else %}
-								{% if contest.active %}
-									<a href="{% url 'cryptics:add_like' sub.id %}?next=/contest/{{contest.id}}"><img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star"></a>
-								{% else %}
-									<img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star">
+									{% if contest.is_voting %}
+										<a href="{% url 'cryptics:add_like' sub.id %}?next=/contest/{{contest.id}}"><img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star"></a>
+									{% else %}
+										<img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star">
+									{% endif %}
 								{% endif %}
 							{% endif %}
 						</td>
@@ -63,7 +67,7 @@
 			{% endfor %}
 		</table>
 	{% else %}
-		<p>Sorry, none yet. {% if contest.active %}Be the first!{% endif %} </p>
+		<p>Sorry, none yet. {% if contest.is_submissions %}Be the first!{% endif %} </p>
 	{% endif %}
 	<a href="{% url 'cryptics:index' %}">Back</a>
 {% endblock content %}

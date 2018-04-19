@@ -7,8 +7,9 @@ from .models import User, Contest, Submission
 
 def index(request):
 	context = {}
-	context["open_contests"] = Contest.objects.filter(active=True)
-	context["past_contests"] = Contest.objects.filter(active=False)
+	context["open_contests"] = Contest.objects.filter(status=Contest.SUBMISSIONS)
+	context["voting_contests"] = Contest.objects.filter(status=Contest.VOTING)
+	context["past_contests"] = Contest.objects.filter(status=Contest.CLOSED)
 	context["current_champ"] = User.objects.sort_users()[0]
 	context["recent_clues"] = Submission.objects.all().order_by("-created_at")[:3]
 
@@ -17,7 +18,7 @@ def index(request):
 @login_required
 def create_contest(request):
 	if request.method == "POST" and request.POST["word"]:
-		if Contest.objects.filter(active=True, started_by=request.user):
+		if Contest.objects.filter(status=Contest.SUBMISSIONS, started_by=request.user):
 			messages.error(request, "Each user can only have one active contest at a time.")
 		else:
 			Contest.objects.add(word=request.POST["word"], started_by=request.user)
@@ -48,8 +49,11 @@ def create_submission(request):
 def add_like(request, submission_id):
 	submission = get_object_or_404(Submission, id=submission_id)
 	submission.contest.check_if_too_old()
-	if not submission.contest.active:
-		messages.error(request, "Sorry, this contest has closed")
+	if not submission.contest.is_voting:
+		if submission.contest.is_submissions:
+			messages.error(request, "Sorry, this contest is not taking votes yet")
+		else:
+			messages.error(request, "Sorry, this contest has closed")
 	elif request.user == submission.submitted_by:
 		messages.error(request, "Sorry, you can't vote for your own submissions")
 	else:
@@ -64,10 +68,13 @@ def add_like(request, submission_id):
 def remove_like(request, submission_id):
 	submission = get_object_or_404(Submission, id=submission_id)
 	submission.contest.check_if_too_old()
-	if submission.contest.active:
+	if submission.contest.is_voting:
 		submission.likers.remove(request.user)
 	else:
-		messages.error(request, "Sorry, this contest has closed")	
+		if submission.contest.is_submissions:
+			messages.error(request, "Sorry, this contest is not taking votes yet")
+		else:
+			messages.error(request, "Sorry, this contest has closed")
 	
 	if "next" in request.GET:
 		return redirect(request.GET["next"])

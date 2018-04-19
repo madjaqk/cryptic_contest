@@ -16,9 +16,9 @@ Puzzlers Club Cryptic Clue Contests
 		<p>Word: <input type="text" name="word" id="new_contest_word"> <a href="#" id="enumerate_link">Auto-enumerate</a> (beta)</p>
 		<input type="submit" value="Create Contest">
 	</form>
+	<hr>
 	{% if open_contests %}
-		<hr>
-		<h3>Contests</h3>
+		<h3>Open Contests</h3>
 		<table>
 			<tr>
 				<th>Word</th>
@@ -28,13 +28,29 @@ Puzzlers Club Cryptic Clue Contests
 			{% for contest in open_contests %}
 				<tr class="{% cycle 'row1' 'row2' %}">
 					<td><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></td>
-					<td>{{contest.end_time|naturaltime}}</td>
+					<td>{{contest.submissions_end_time|naturaltime}}</td>
 					<td><a href="{% url 'cryptics:show_user' contest.started_by.id %}">{{contest.started_by}}</a></td>
 				</tr>
 			{% endfor %}
 		</table>
 	{% else %}
 		<p>No open contests currently. {% if user.is_authenticated %}Start one!{% endif %}</p>
+	{% endif %}
+	{% if voting_contests %}
+		<hr>
+		<h3>Vote For Your Favorite Clue Now!</h3>
+		<table>
+			<tr>
+				<th>Word</th>
+				<th>Voting Ends...</th>
+			</tr>
+			{% for contest in voting_contests %}
+				<tr class="{% cycle 'row1' 'row2' %}">
+					<td><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></td>
+					<td>{{contest.voting_end_time|naturaltime}}</td>
+				</tr>
+			{% endfor %}
+		</table>
 	{% endif %}
 	<hr>
 	<p><strong>The current champion is {{ current_champ.user }}, with {{ current_champ.contests_won }} win{{ current_champ.contests_won|pluralize }}!  All hail {{ current_champ.user }}!</strong>  <a href="{% url 'cryptics:all_users' %}">Full stats</a></p>
@@ -56,17 +72,19 @@ Puzzlers Club Cryptic Clue Contests
 					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a> ({{sub.created_at|naturaltime}})</td>
 					{% if user.is_authenticated and user != sub.submitted_by %}
 						<td>
-							{% if user in sub.likers.all %}
-								{% if sub.contest.active %}
-									<a href="{% url 'cryptics:remove_like' sub.id %}?next=/"><img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star"></a>
+							{% if not sub.contest.is_submissions %}
+								{% if user in sub.likers.all %}
+									{% if sub.contest.is_voting %}
+										<a href="{% url 'cryptics:remove_like' sub.id %}?next=/"><img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star"></a>
+									{% else %}
+										<img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star">
+									{% endif %}
 								{% else %}
-									<img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star">
-								{% endif %}
-							{% else %}
-								{% if sub.contest.active %}
-									<a href="{% url 'cryptics:add_like' sub.id %}?next=/"><img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star"></a>
-								{% else %}
-									<img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star">
+									{% if sub.contest.is_voting %}
+										<a href="{% url 'cryptics:add_like' sub.id %}?next=/"><img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star"></a>
+									{% else %}
+										<img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star">
+									{% endif %}
 								{% endif %}
 							{% endif %}
 						</td>

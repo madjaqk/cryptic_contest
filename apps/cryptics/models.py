@@ -9,11 +9,8 @@ from django.template.defaultfilters import pluralize
 def to_seconds(td):
 	return td.days*24*60*60 + td.seconds + td.microseconds
 
-# SUBMISSIONS_LENGTH = datetime.timedelta(days=2, minutes=2)
-# VOTING_LENGTH = datetime.timedelta(days=2, minutes=2)
-
-SUBMISSIONS_LENGTH = datetime.timedelta(minutes=10)
-VOTING_LENGTH = datetime.timedelta(minutes=10)
+SUBMISSIONS_LENGTH = datetime.timedelta(days=2, minutes=2)
+VOTING_LENGTH = datetime.timedelta(days=2, minutes=2)
 
 class ContestManager(models.Manager):
 	def add(self, word, started_by):

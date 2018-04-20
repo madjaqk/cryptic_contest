@@ -28,7 +28,12 @@ def show_contest(request, contest_id):
 	contest = get_object_or_404(Contest, id=contest_id)
 	contest.check_if_too_old()
 
-	return render(request, "cryptics/show.html", {"contest": contest})	
+	context = {
+		"contest": contest,
+		"sort_order": "sort_order" if contest.is_closed else "id",
+		}
+
+	return render(request, "cryptics/show.html", context)	
 
 @login_required
 def create_submission(request):

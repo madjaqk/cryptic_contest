@@ -33,39 +33,41 @@
 				<th>Likes</th>
 			</tr>
 			{% for sub in this_user.submissions.all|dictsort:"sort_order" %}
-				<tr class="{% cycle 'row1' 'row2' %}">
-					<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_user' this_user.id %}#clue{{sub.id}}">{{sub.id}}</td>
-					<td><a href="{% url 'cryptics:show_contest' sub.contest.id %}">{{sub.contest.word}}</a></td>
-					<td>{{sub.clue}}</td>
-					<td class="explanation">{{sub.explanation|linebreaksbr}}</td>
-					<td>{{sub.submitted_by}}</td>
-					<td title="{{sub.likers.all|join:', '}}">
-						{% if not sub.contest.is_submissions %}
-							{{sub.likers.count}}
-						{% else %}
-							Still open
-						{% endif %}
-					</td>
-					{% if user.is_authenticated and user != this_user %}
-						<td>
+				{% if sub.contest.is_closed %}
+					<tr class="{% cycle 'row1' 'row2' %}">
+						<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_user' this_user.id %}#clue{{sub.id}}">{{sub.id}}</td>
+						<td><a href="{% url 'cryptics:show_contest' sub.contest.id %}">{{sub.contest.word}}</a></td>
+						<td>{{sub.clue}}</td>
+						<td{% if user != this_user %} class="explanation"{% endif %}>{{sub.explanation|linebreaksbr}}</td>
+						<td>{{sub.submitted_by}}</td>
+						<td title="{{sub.likers.all|join:', '}}">
 							{% if not sub.contest.is_submissions %}
-								{% if user in sub.likers.all %}
-									{% if sub.contest.is_voting %}
-										<a href="{% url 'cryptics:remove_like' sub.id %}?next=/user/{{this_user.id}}"><img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star"></a>
-									{% else %}
-										<img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star">
-									{% endif %}
-								{% else %}
-									{% if sub.contest.is_voting %}
-										<a href="{% url 'cryptics:add_like' sub.id %}?next=/user/{{this_user.id}}"><img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star"></a>
-									{% else %}
-										<img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star">
-									{% endif %}
-								{% endif %}
+								{{sub.likers.count}}
+							{% else %}
+								Still open
 							{% endif %}
 						</td>
-					{% endif %}
-				</tr>
+						{% if user.is_authenticated and user != this_user %}
+							<td>
+								{% if not sub.contest.is_submissions %}
+									{% if user in sub.likers.all %}
+										{% if sub.contest.is_voting %}
+											<a href="{% url 'cryptics:remove_like' sub.id %}?next=/user/{{this_user.id}}"><img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star"></a>
+										{% else %}
+											<img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star">
+										{% endif %}
+									{% else %}
+										{% if sub.contest.is_voting %}
+											<a href="{% url 'cryptics:add_like' sub.id %}?next=/user/{{this_user.id}}"><img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star"></a>
+										{% else %}
+											<img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star">
+										{% endif %}
+									{% endif %}
+								{% endif %}
+							</td>
+						{% endif %}
+					</tr>
+				{% endif %}
 			{% endfor %}
 		</table>
 	{% else %}

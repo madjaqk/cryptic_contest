@@ -32,19 +32,21 @@
 				<th>Clue ID</th>
 				<th>Clue</th>
 				<th>Explanation (highlight)</th>
-				<th>Submitted By</th>
-				{% if not contest.is_submissions %}
+				{% if contest.is_closed %}
+					<th>Submitted By</th>
 					<th>Likes</th>
 				{% endif %}
 			</tr>
-			{% for sub in contest.submissions.all|dictsort:"sort_order" %}
+			{% for sub in contest.submissions.all|dictsort:sort_order %}
 				<tr class="{% cycle 'row1' 'row2' %}">
 					<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_contest' contest.id %}#clue{{sub.id}}">{{sub.id}}</td>
 					<td>{{sub.clue}}</td>
-					<td class="explanation">{{sub.explanation|linebreaksbr}}</td>
-					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a></td>
-					{% if not contest.is_submissions %}
+					<td{% if user != sub.submitted_by %} class="explanation"{% endif %}>{{sub.explanation|linebreaksbr}}</td>
+					{% if contest.is_closed %}
+						<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a></td>
 						<td title="{{sub.likers.all|join:', '}}">{{sub.likers.count}}</td>
+					{% endif %}
+					{% if not contest.is_submissions %}
 						{% if user.is_authenticated and user != sub.submitted_by %}
 							<td>
 								{% if user in sub.likers.all %}

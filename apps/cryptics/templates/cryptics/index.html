@@ -62,14 +62,14 @@ Puzzlers Club Cryptic Clue Contests
 				<th>Contest</th>
 				<th>Clue</th>
 				<th>Explanation (highlight)</th>
-				<th>Submitted By</th>
+				<th>Submitted</th>
 			</tr>
 			{% for sub in recent_clues %}
 				<tr class="{% cycle 'row1' 'row2' %}">
 					<td><a href="{% url 'cryptics:show_contest' sub.contest.id %}">{{sub.contest.word}}</td>
 					<td>{{sub.clue}}</td>
-					<td class="explanation">{{sub.explanation|linebreaksbr}}</td>
-					<td><a href="{% url 'cryptics:show_user' sub.submitted_by.id %}">{{sub.submitted_by}}</a> ({{sub.created_at|naturaltime}})</td>
+					<td{% if user != sub.submitted_by %} class="explanation"{% endif %}>{{sub.explanation|linebreaksbr}}</td>
+					<td>{{sub.created_at|naturaltime}}</td>
 					{% if user.is_authenticated and user != sub.submitted_by %}
 						<td>
 							{% if not sub.contest.is_submissions %}

@@ -27,7 +27,7 @@ Puzzlers Club Cryptic Clue Contests
 			</tr>
 			{% for contest in open_contests %}
 				<tr class="{% cycle 'row1' 'row2' %}">
-					<td><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></td>
+					<td><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{contest.word}}</a></td>
 					<td>{{contest.submissions_end_time|naturaltime}}</td>
 					<td><a href="{% url 'cryptics:show_user' contest.started_by.id %}">{{contest.started_by}}</a></td>
 				</tr>
@@ -46,7 +46,7 @@ Puzzlers Club Cryptic Clue Contests
 			</tr>
 			{% for contest in voting_contests %}
 				<tr class="{% cycle 'row1' 'row2' %}">
-					<td><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></td>
+					<td><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{contest.word}}</a></td>
 					<td>{{contest.voting_end_time|naturaltime}}</td>
 				</tr>
 			{% endfor %}
@@ -66,7 +66,7 @@ Puzzlers Club Cryptic Clue Contests
 			</tr>
 			{% for sub in recent_clues %}
 				<tr class="{% cycle 'row1' 'row2' %}">
-					<td><a href="{% url 'cryptics:show_contest' sub.contest.id %}">{{sub.contest.word}}</td>
+					<td><a href="{% url 'cryptics:show_contest_full' sub.contest.id sub.contest.slugified %}">{{sub.contest.word}}</td>
 					<td>{{sub.clue}}</td>
 					<td{% if user != sub.submitted_by %} class="explanation"{% endif %}>{{sub.explanation|linebreaksbr}}</td>
 					<td>{{sub.created_at|naturaltime}}</td>
@@ -97,7 +97,7 @@ Puzzlers Club Cryptic Clue Contests
 		<h3>Past Contests</h3>
 		<ul>
 			{% for contest in past_contests %}
-				<li><a href="{% url 'cryptics:show_contest' contest.id %}">{{contest.word}}</a></li>
+				<li><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{contest.word}}</a></li>
 			{% endfor %}
 		</ul>
 	{% endif %}

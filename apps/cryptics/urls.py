@@ -7,6 +7,7 @@ urlpatterns = [
 	path("", views.index, name="index"),
 	path("create_contest", views.create_contest, name="create_contest"),
 	path("contest/<int:contest_id>", views.show_contest, name="show_contest"),
+	path("contest/<int:contest_id>-<word>", views.show_contest_full, name="show_contest_full"),
 	path("create_submission", views.create_submission, name="create_submission"),
 	path("submission/<int:submission_id>/like", views.add_like, name="add_like"),
 	path("submission/<int:submission_id>/dislike", views.remove_like, name="remove_like"),

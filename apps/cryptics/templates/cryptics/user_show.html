@@ -9,14 +9,14 @@
 	<h1>{{ this_user.username }}</h1>
 	<p><strong>Contests started:</strong> 
 		{% for contest in this_user.contests_started.all %}
-			<a href="{% url 'cryptics:show_contest' contest.id %}">{{ contest.word }}</a>{% if not forloop.last %}, {% endif %}
+			<a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{ contest.word }}</a>{% if not forloop.last %}, {% endif %}
 		{% empty %}
 			None!
 		{% endfor %}
 	</p>
 	<p><strong>Contests won:</strong> 
 		{% for contest in this_user.contests_won.all %}
-			<a href="{% url 'cryptics:show_contest' contest.id %}">{{ contest.word }}</a>{% if not forloop.last %}, {% endif %}
+			<a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{ contest.word }}</a>{% if not forloop.last %}, {% endif %}
 		{% empty %}
 			None!
 		{% endfor %}
@@ -36,7 +36,7 @@
 				{% if sub.contest.is_closed %}
 					<tr class="{% cycle 'row1' 'row2' %}">
 						<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_user' this_user.id %}#clue{{sub.id}}">{{sub.id}}</td>
-						<td><a href="{% url 'cryptics:show_contest' sub.contest.id %}">{{sub.contest.word}}</a></td>
+						<td><a href="{% url 'cryptics:show_contest_full' sub.contest.id sub.contest.slugified %}">{{sub.contest.word}}</a></td>
 						<td>{{sub.clue}}</td>
 						<td{% if user != this_user %} class="explanation"{% endif %}>{{sub.explanation|linebreaksbr}}</td>
 						<td>{{sub.submitted_by}}</td>

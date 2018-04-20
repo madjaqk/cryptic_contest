@@ -26,6 +26,10 @@ def create_contest(request):
 
 def show_contest(request, contest_id):
 	contest = get_object_or_404(Contest, id=contest_id)
+	return redirect("cryptics:show_contest_full", contest.id, contest.slugified)
+
+def show_contest_full(request, contest_id, word=None):
+	contest = get_object_or_404(Contest, id=contest_id)
 	contest.check_if_too_old()
 
 	context = {

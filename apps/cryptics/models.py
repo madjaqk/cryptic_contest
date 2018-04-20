@@ -4,6 +4,7 @@ import threading
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.text import slugify
 from django.template.defaultfilters import pluralize
 
 def to_seconds(td):
@@ -64,6 +65,10 @@ class Contest(models.Model):
 	@property
 	def is_closed(self):
 		return self.status == self.CLOSED
+
+	@property
+	def slugified(self):
+		return slugify(self.word)
 
 	def __str__(self):
 		return f"Contest: {self.word}"

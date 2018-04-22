@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Avg, FloatField
+from django.urls import reverse
 
 from .models import User, Contest, Submission
 
@@ -58,6 +59,37 @@ def create_submission(request):
 		messages.success(request, "Clue submitted!")
 	
 	return redirect("cryptics:show_contest", request.POST["contest_id"])
+
+@login_required
+def delete_submission(request, submission_id):
+	submission = get_object_or_404(Submission, id=submission_id)
+	submission.contest.check_if_too_old()
+
+	valid = True
+
+	if request.user != submission.submitted_by:
+		messages.error(request, "You can only delete clues that you submitted")
+		valid = False
+	elif not submission.contest.is_submissions:
+		messages.error(request, "Sorry, you can't delete a clue once voting has begun")
+		valid = False
+
+	if valid and request.method == "GET":
+		context = {
+			"sub": submission,
+			"next_url": request.GET["next"] if "next" in request.GET else reverse("cryptics:show_contest", kwargs={"contest_id": submission.contest_id})
+		}
+		return render(request, "cryptics/delete_clue.html", context)
+
+	if valid and request.method == "POST":
+		submission.delete()
+
+	if "next" in request.GET:
+		return redirect(request.GET["next"])
+	else:
+		return redirect("cryptics:show_contest", submission.contest.id)
+
+
 
 @login_required
 def add_like(request, submission_id):

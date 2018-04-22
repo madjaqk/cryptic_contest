@@ -30,11 +30,16 @@ def show_contest(request, contest_id):
 
 def show_contest_full(request, contest_id, word=None):
 	contest = get_object_or_404(Contest, id=contest_id)
+
+	if word != contest.slugified:
+		return redirect("cryptics:show_contest_full", contest.id, contest.slugified)
+
 	contest.check_if_too_old()
 
 	context = {
 		"contest": contest,
 		"sort_order": "sort_order" if contest.is_closed else "id",
+		"highlight": int(request.GET.get("highlight", -1)),
 		}
 
 	return render(request, "cryptics/show.html", context)	
@@ -95,4 +100,10 @@ def all_users(request):
 
 def show_user(request, user_id):
 	user = get_object_or_404(User, id=user_id)
-	return render(request, "cryptics/user_show.html", {"this_user": user})
+	
+	context = {
+		"this_user": user,
+		"highlight": int(request.GET.get("highlight", -1)),
+		}
+
+	return render(request, "cryptics/user_show.html", context)

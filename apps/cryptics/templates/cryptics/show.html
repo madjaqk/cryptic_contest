@@ -38,8 +38,8 @@
 				{% endif %}
 			</tr>
 			{% for sub in contest.submissions.all|dictsort:sort_order %}
-				<tr class="{% cycle 'row1' 'row2' %}">
-					<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}#clue{{sub.id}}">{{sub.id}}</td>
+				<tr class="{% cycle 'row1' 'row2' %}"{% if sub.id == highlight %} id="highlight"{% endif %}>
+					<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}?highlight={{sub.id}}#clue{{sub.id}}">{{sub.id}}</td>
 					<td>{{sub.clue}}</td>
 					<td{% if user != sub.submitted_by %} class="explanation"{% endif %}>{{sub.explanation|linebreaksbr}}</td>
 					{% if contest.is_closed %}

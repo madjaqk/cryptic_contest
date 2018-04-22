@@ -13,19 +13,15 @@
 	background-color: #DDDDDD;
 }
 
-.row1 td.explanation {
-	color: white;
+#highlight {
+	background-color: #ccffcc;
 }
 
-.row2 td.explanation {
-	color: #DDDDDD;
+td.explanation {
+	color: transparent;
 }
 
-.row1 td.explanation:hover {
-	color: black;
-}
-
-.row2 td.explanation:hover {
+td.explanation:hover {
 	color: black;
 }
 

@@ -74,15 +74,15 @@ Puzzlers Club Cryptic Clue Contests
 						<td>
 							{% if user in sub.likers.all %}
 								{% if sub.contest.is_voting %}
-									<a href="{% url 'cryptics:remove_like' sub.id %}?next=/"><img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star"></a>
+									<a href="{% url 'cryptics:remove_like' sub.id %}?next=/"><img src="{% static 'cryptics/images/filled_star.png' %}" title="Un-like this clue?" alt="filled star" class="like_star"></a>
 								{% else %}
-									<img src="{% static 'cryptics/images/filled_star.png' %}" class="like_star">
+									<img src="{% static 'cryptics/images/filled_star.png' %}" title="You liked this clue" alt="filled star" class="like_star">
 								{% endif %}
 							{% else %}
 								{% if sub.contest.is_voting %}
-									<a href="{% url 'cryptics:add_like' sub.id %}?next=/"><img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star"></a>
+									<a href="{% url 'cryptics:add_like' sub.id %}?next=/"><img src="{% static 'cryptics/images/empty_star.png' %}" title="Like this clue?" alt="empty star" class="like_star"></a>
 								{% else %}
-									<img src="{% static 'cryptics/images/empty_star.png' %}" class="like_star">
+									<img src="{% static 'cryptics/images/empty_star.png' %}" title="You didn't like this clue" alt="empty star" class="like_star">
 								{% endif %}
 							{% endif %}
 						</td>

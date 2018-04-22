@@ -1,8 +1,17 @@
 function click_to_reveal(el){
 	if(el.classList){
-		el.classList.remove("explanation")
+		el.classList.toggle("explanation")
 	} else {
-		el.className = el.className.replace(new RegExp('(^|\\b)explanation(\\b|$)', 'gi'), ' ');
+		var classes = el.className.split(" ")
+		var existing_index = classes.indexOf("explanation")
+
+		if(existing_index >= 0){
+			classes.splice(existing_index, 1)
+		} else {
+			classes.push("explanation")
+		}
+
+		el.className = classes.join(" ")
 	}
 }
 

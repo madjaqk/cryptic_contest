@@ -45,13 +45,11 @@ class Contest(models.Model):
 
 	@property
 	def submissions_end_time(self):
-		if self.is_submissions:
-			return self.created_at + SUBMISSIONS_LENGTH
+		return self.created_at + SUBMISSIONS_LENGTH
 
 	@property
 	def voting_end_time(self):
-		if self.is_voting or self.is_submissions:
-			return self.created_at + SUBMISSIONS_LENGTH + VOTING_LENGTH
+		return self.created_at + SUBMISSIONS_LENGTH + VOTING_LENGTH
 
 	# These properties are so that I can check status on templates without hardcoding in `contest.status == "S"` (or whatever)
 	@property

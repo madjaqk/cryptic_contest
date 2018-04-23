@@ -66,7 +66,7 @@ Puzzlers Club Cryptic Clue Contests
 			</tr>
 			{% for sub in recent_clues %}
 				<tr class="{% cycle 'row1' 'row2' %}">
-					<td><a href="{% url 'cryptics:show_contest_full' sub.contest.id sub.contest.slugified %}">{{sub.contest.word}}</td>
+					<td><a href="{% url 'cryptics:show_contest_full' sub.contest.id sub.contest.slugified %}?highlight={{sub.id}}#clue{{sub.id}}">{{sub.contest.word}}</td>
 					<td>{{sub.clue}}</td>
 					<td{% if user != sub.submitted_by %} class="explanation"{% endif %}>{{sub.explanation|linebreaksbr}}</td>
 					<td>{{sub.created_at|naturaltime}}</td>

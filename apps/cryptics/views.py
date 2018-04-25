@@ -10,7 +10,7 @@ def index(request):
 	context = {}
 	context["open_contests"] = Contest.objects.filter(status=Contest.SUBMISSIONS)
 	context["voting_contests"] = Contest.objects.filter(status=Contest.VOTING)
-	context["past_contests"] = Contest.objects.filter(status=Contest.CLOSED)
+	context["past_contests"] = Contest.objects.ended_recently()
 	context["current_champ"] = User.objects.sort_users()[0]
 	context["recent_clues"] = Submission.objects.all().order_by("-created_at")[:3]
 
@@ -139,3 +139,6 @@ def show_user(request, user_id):
 		}
 
 	return render(request, "cryptics/user_show.html", context)
+
+def all_closed_contests(request):
+	return render(request, "cryptics/all_closed_contests.html", {"contests": Contest.objects.filter(status=Contest.CLOSED)})

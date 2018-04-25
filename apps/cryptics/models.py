@@ -12,12 +12,16 @@ def to_seconds(td):
 
 SUBMISSIONS_LENGTH = datetime.timedelta(days=2, minutes=2)
 VOTING_LENGTH = datetime.timedelta(days=2, minutes=2)
+RECENT_LENGTH = datetime.timedelta(days=7)
 
 class ContestManager(models.Manager):
 	def add(self, word, started_by):
 		new_contest = self.create(word=word.upper(), started_by=started_by)
 		t = threading.Timer(to_seconds(SUBMISSIONS_LENGTH), new_contest.switch_to_voting)
 		t.start()
+
+	def ended_recently(self):
+		return self.filter(status=Contest.CLOSED, created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH))
 
 class Contest(models.Model):
 	word = models.CharField(max_length=50)

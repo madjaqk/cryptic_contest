@@ -23,7 +23,7 @@ Puzzlers Club Cryptic Clue Contests
 			<tr>
 				<th>Word</th>
 				<th>Ends...</th>
-				<th>Submitted By</th>
+				<th>Started By</th>
 			</tr>
 			{% for contest in open_contests %}
 				<tr class="{% cycle 'row1' 'row2' %}">
@@ -61,7 +61,7 @@ Puzzlers Club Cryptic Clue Contests
 			<tr>
 				<th>Contest</th>
 				<th>Clue</th>
-				<th>Explanation (highlight)</th>
+				<th>Explanation (hover)</th>
 				<th>Submitted</th>
 			</tr>
 			{% for sub in recent_clues %}
@@ -102,6 +102,8 @@ Puzzlers Club Cryptic Clue Contests
 			{% for contest in past_contests reversed %}
 				<li><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{contest.word}}</a> (ended {{contest.voting_end_time|timesince}} ago)</li>
 			{% endfor %}
+			...
+			<p><a href="{% url 'cryptics:all_closed_contests' %}">Full Archives</a></p>
 		</ul>
 	{% endif %}
 

@@ -13,5 +13,6 @@ urlpatterns = [
 	path("submission/<int:submission_id>/dislike", views.remove_like, name="remove_like"),
 	path("all_users", views.all_users, name="all_users"),
 	path("user/<int:user_id>", views.show_user, name="show_user"),
-	path("submission/<int:submission_id>/delete", views.delete_submission, name="delete_submission")
+	path("submission/<int:submission_id>/delete", views.delete_submission, name="delete_submission"),
+	path("archives", views.all_closed_contests, name="all_closed_contests"),
 ]

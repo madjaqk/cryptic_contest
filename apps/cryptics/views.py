@@ -8,8 +8,8 @@ from .models import User, Contest, Submission
 
 def index(request):
 	context = {}
-	context["open_contests"] = Contest.objects.filter(status=Contest.SUBMISSIONS)
-	context["voting_contests"] = Contest.objects.filter(status=Contest.VOTING)
+	context["open_contests"] = Contest.objects.filter(status=Contest.SUBMISSIONS).order_by("created_at")
+	context["voting_contests"] = Contest.objects.filter(status=Contest.VOTING).order_by("created_at")
 	context["past_contests"] = Contest.objects.ended_recently()
 	context["current_champ"] = User.objects.sort_users()[0]
 	context["recent_clues"] = Submission.objects.all().order_by("-created_at")[:3]

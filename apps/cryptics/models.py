@@ -21,7 +21,7 @@ class ContestManager(models.Manager):
 		t.start()
 
 	def ended_recently(self):
-		return self.filter(status=Contest.CLOSED, created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH))
+		return self.filter(status=Contest.CLOSED, created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH)).order_by("-created_at")
 
 class Contest(models.Model):
 	word = models.CharField(max_length=50)

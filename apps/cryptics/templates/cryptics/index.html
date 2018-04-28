@@ -99,7 +99,7 @@ Puzzlers Club Cryptic Clue Contests
 		<hr>
 		<h3>Past Contests</h3>
 		<ul>
-			{% for contest in past_contests reversed %}
+			{% for contest in past_contests %}
 				<li><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{contest.word}}</a> (ended {{contest.voting_end_time|timesince}} ago)</li>
 			{% endfor %}
 			...

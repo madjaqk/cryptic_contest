@@ -89,8 +89,6 @@ def delete_submission(request, submission_id):
 	else:
 		return redirect("cryptics:show_contest", submission.contest.id)
 
-
-
 @login_required
 def add_like(request, submission_id):
 	submission = get_object_or_404(Submission, id=submission_id)

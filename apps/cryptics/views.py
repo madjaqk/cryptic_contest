@@ -139,4 +139,4 @@ def show_user(request, user_id):
 	return render(request, "cryptics/user_show.html", context)
 
 def all_closed_contests(request):
-	return render(request, "cryptics/all_closed_contests.html", {"contests": Contest.objects.filter(status=Contest.CLOSED)})
+	return render(request, "cryptics/all_closed_contests.html", {"contests": Contest.objects.filter(status=Contest.CLOSED).order_by("created_at")})

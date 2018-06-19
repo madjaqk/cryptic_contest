@@ -103,9 +103,9 @@ Puzzlers Club Cryptic Clue Contests
 				<li><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{contest.word}}</a> (ended {{contest.voting_end_time|timesince}} ago)</li>
 			{% endfor %}
 			...
-			<p><a href="{% url 'cryptics:all_closed_contests' %}">Full Archives</a></p>
 		</ul>
 	{% endif %}
+	<p><a href="{% url 'cryptics:all_closed_contests' %}">Full Archives</a></p>
 
 	<script type="text/javascript" src="{% static 'cryptics/js/enumerate.js' %}"></script>
 	<script type="text/javascript" src="{% static 'cryptics/js/click_to_reveal.js' %}"></script>

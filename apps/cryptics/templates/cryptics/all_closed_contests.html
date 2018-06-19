@@ -5,15 +5,16 @@
 {% endblock title %}
 
 {% block content %}
+	{% load static %}
 	<h1>Full Archives</h1>
 	<table>
 		<tr>
 			<th>Word</th>
 			<th>Started By</th>
 			<th>Started Date</th>
+			<th>Winning Clue By</th>
 			<th>Winning Clue</th>
 			<th>Explanation (hover)</th>
-			<th>Winning Clue By</th>
 		</tr>
 		{% for contest in contests %}
 			<tr class="{% cycle 'row1' 'row2' %}">
@@ -21,12 +22,13 @@
 				<td><a href="{% url 'cryptics:show_user' contest.started_by.id %}">{{ contest.started_by }}</td>
 				<td>{{ contest.created_at }}</td>
 				{% if contest.winning_entry %}
+					<td><a href="{% url 'cryptics:show_user' contest.winning_user.id %}">{{ contest.winning_user }}</a></td>
 					<td>{{ contest.winning_entry.clue }}</td>
 					<td{% if user != sub.submitted_by %} class="explanation"{% endif %}>{{ contest.winning_entry.explanation|linebreaksbr }}</td>
-					<td><a href="{% url 'cryptics:show_user' contest.winning_user.id %}">{{ contest.winning_user }}</a></td>
 				{% endif %}
 			</tr>
 		{% endfor %}
 	</table>
 	<p><a href="{% url 'cryptics:index' %}">Back</a></p>
+	<script type="text/javascript" src="{% static 'cryptics/js/click_to_reveal.js' %}"></script>
 {% endblock content %}

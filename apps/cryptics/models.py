@@ -3,9 +3,13 @@ import threading
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.template.defaultfilters import pluralize
+
+from .utils import to_discord
 
 def to_seconds(td):
 	return td.days*24*60*60 + td.seconds + td.microseconds
@@ -14,11 +18,16 @@ SUBMISSIONS_LENGTH = datetime.timedelta(days=2, minutes=2)
 VOTING_LENGTH = datetime.timedelta(days=2, minutes=2)
 RECENT_LENGTH = datetime.timedelta(days=7)
 
+SITE_URL = "http://" + Site.objects.get_current().domain
+
 class ContestManager(models.Manager):
 	def add(self, word, started_by):
 		new_contest = self.create(word=word.upper(), started_by=started_by)
 		t = threading.Timer(to_seconds(SUBMISSIONS_LENGTH), new_contest.switch_to_voting)
 		t.start()
+
+		msg = f"{new_contest.started_by} started a new contest: {new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
+		to_discord(msg)
 
 	def ended_recently(self):
 		return self.filter(status=Contest.CLOSED, created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH)).order_by("-created_at")
@@ -75,12 +84,22 @@ class Contest(models.Model):
 	def __str__(self):
 		return f"Contest: {self.word}"
 
+	def get_absolute_url(self):
+		url_kwargs = {
+			"contest_id": self.id,
+			"word": self.slugified,
+		}
+		return reverse("cryptics:show_contest_full", kwargs=url_kwargs)
+
 	def declare_winner(self):
 		if self.submissions.exists():
 			winning_entry = self.submissions.annotate(likes=models.Count("likers")).order_by("-likes", "created_at").first()
 			self.winning_entry = winning_entry
 			self.winning_user = winning_entry.submitted_by
 			self.save()
+
+			msg = f"Voting is closed for {self.word}!  The winning clue is `{self.winning_entry.clue}`, submitted by {self.winning_entry.submitted_by}.  Congratulations!  {SITE_URL}{self.get_absolute_url()}"
+			to_discord(msg)
 
 	def deactivate(self):
 		self.declare_winner()
@@ -91,8 +110,12 @@ class Contest(models.Model):
 	def switch_to_voting(self):
 		self.status = self.VOTING
 		self.save()
+
 		t = threading.Timer(to_seconds(VOTING_LENGTH), self.deactivate)
 		t.start()
+
+		msg = f"Voting is now open for {self.word}! {SITE_URL}{self.get_absolute_url()}"
+		to_discord(msg)
 
 	def check_if_too_old(self):
 		if self.is_closed:
@@ -131,6 +154,10 @@ class SubmissionManager(models.Manager):
 		else:
 			new_sub = Submission(clue=data["clue"], explanation=data["explanation"], contest=contest, submitted_by=user)
 			new_sub.save()
+
+			msg = f"New submission for {new_sub.contest.word}: {new_sub.clue} -- {SITE_URL}{new_sub.get_absolute_url()}"
+			to_discord(msg)
+
 			return {"status": True}
 
 class Submission(models.Model):
@@ -150,6 +177,13 @@ class Submission(models.Model):
 
 	def __str__(self):
 		return f"Submission: {self.clue}, by {self.submitted_by}"
+
+	def get_absolute_url(self):
+		url_kwargs = {
+			"contest_id": self.contest.id,
+			"word": self.contest.slugified,
+		}
+		return reverse("cryptics:show_contest_full", kwargs=url_kwargs) + f"?highlight={self.id}#clue{self.id}"
 
 def sort_users():
 	# sort_users method to monkeypatch into User manager, because it's a built-in I don't have direct access to.

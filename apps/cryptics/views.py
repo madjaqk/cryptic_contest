@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, Avg, FloatField
 from django.urls import reverse
 
 from .models import User, Contest, Submission
+from .utils import to_discord
 
 def index(request):
 	context = {}
@@ -43,7 +45,7 @@ def show_contest_full(request, contest_id, word=None):
 		"highlight": int(request.GET.get("highlight", -1)),
 		}
 
-	return render(request, "cryptics/show.html", context)	
+	return render(request, "cryptics/show.html", context)
 
 @login_required
 def create_submission(request):
@@ -57,7 +59,7 @@ def create_submission(request):
 			messages.error(request, error)
 	else:
 		messages.success(request, "Clue submitted!")
-	
+
 	return redirect("cryptics:show_contest", request.POST["contest_id"])
 
 @login_required
@@ -119,7 +121,7 @@ def remove_like(request, submission_id):
 			messages.error(request, "Sorry, this contest is not taking votes yet")
 		else:
 			messages.error(request, "Sorry, this contest has closed")
-	
+
 	if "next" in request.GET:
 		return redirect(request.GET["next"])
 	else:
@@ -130,7 +132,7 @@ def all_users(request):
 
 def show_user(request, user_id):
 	user = get_object_or_404(User, id=user_id)
-	
+
 	context = {
 		"this_user": user,
 		"highlight": int(request.GET.get("highlight", -1)),

@@ -147,3 +147,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+# URLs for Discord webhooks
+DISCORD_URLS = config("DISCORD_URLS", cast=lambda x: [url.strip() for url in x.split(",")] if x else [], default=[])

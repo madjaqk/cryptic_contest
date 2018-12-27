@@ -10,7 +10,7 @@ def to_discord(msg):
     """ Simple util to post messages to Discord """
     payload = {
         "content": msg,
-        "username": "Machine to steal books (5)",
+        "username": "Bible, starting in Genesis, describes humanoid creation (5)",
         "avatar_url": SITE_URL + static("cryptics/images/robot_face.png"),
     }
 

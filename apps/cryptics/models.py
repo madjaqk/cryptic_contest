@@ -102,12 +102,14 @@ class Contest(models.Model):
 			to_discord(msg)
 
 	def deactivate(self):
+		self.refresh_from_db()
 		self.declare_winner()
 
 		self.status = self.CLOSED
 		self.save()
 
 	def switch_to_voting(self):
+		self.refresh_from_db()
 		self.status = self.VOTING
 		self.save()
 

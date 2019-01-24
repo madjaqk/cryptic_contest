@@ -12,8 +12,9 @@
 		<form action="{% url 'cryptics:create_submission' %}" method="post">
 			{% csrf_token %}
 			<input type="hidden" name="contest_id" value="{{ contest.id }}">
-			<p>Clue: <input type="text" name="clue" size="60"></p>
-			<p>Explanation:</p> 
+			<p>Clue: <input type="text" name="clue" id="new_submission" size="60"></p>
+			<p class="warning" id="enum_warning">Your clue should include the enumeration.</p>
+			<p>Explanation:</p>
 			<p><textarea rows=4 cols=40 name="explanation"></textarea></p>
 			<input type="submit" value="Submit">
 		</form>
@@ -78,4 +79,5 @@
 	<a href="{% url 'cryptics:index' %}">Back</a>
 
 	<script type="text/javascript" src="{% static 'cryptics/js/click_to_reveal.js' %}"></script>
+	<script type="text/javascript" src="{% static 'cryptics/js/warn_about_enumeration.js' %}"></script>
 {% endblock content %}

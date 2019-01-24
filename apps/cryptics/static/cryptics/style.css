@@ -40,3 +40,9 @@ td.explanation:hover {
 	font-style: italic;
 	font-size: 1.2em;
 }
+
+p.warning {
+	color: red;
+	font-weight: bold;
+	display: none;
+}

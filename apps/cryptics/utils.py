@@ -4,7 +4,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 
 import requests
 
-SITE_URL = "http://" + Site.objects.get_current().domain
+SITE_URL = "https://" + Site.objects.get_current().domain
 
 def to_discord(msg):
     """ Simple util to post messages to Discord """

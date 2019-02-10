@@ -8,11 +8,16 @@
 	</head>
 	<body>
 		<div id="header">
-			{% if user.is_authenticated %}
-				Hello, <strong>{{user}}</strong>! <a href="{% url 'account_logout' %}">Log out?</a>
-			{% else %}
-				<a href="{% url 'account_login' %}">Log in</a> to submit clues or contest words.
-			{% endif %}
+			<div id="header_links">
+				<a href="{% url 'cryptics:index' %}">Home</a> | <a href="{% url 'cryptics:all_users' %}">User Stats</a>
+			</div>
+			<div id="header_login">
+				{% if user.is_authenticated %}
+					Hello, <strong>{{user}}</strong>! <a href="{% url 'account_logout' %}">Log out?</a>
+				{% else %}
+					<a href="{% url 'account_login' %}">Log in</a> to submit clues or contest words.
+				{% endif %}
+			</div>
 		</div>
 		{% if messages %}
 			<ul class="messages">
@@ -21,9 +26,9 @@
 				{% endfor %}
 			</ul>
 		{% endif %}
-		
+
 		{% block content %}
-			
+
 		{% endblock content %}
 	</body>
 </html>

@@ -2,6 +2,14 @@
 	font-style: italic;
 	border-bottom: 1px solid black;
 	padding-bottom: 5px;
+}
+
+#header div {
+	display: inline-block;
+}
+
+#header_login {
+	float: right;
 	text-align: right;
 }
 

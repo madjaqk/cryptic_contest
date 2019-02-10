@@ -5,8 +5,9 @@
 {% endblock title %}
 
 {% block content %}
+	{% load static %}
 	<h1>All Users</h1>
-	<table>
+	<table class="sortable">
 		<tr>
 			<th>Username</th>
 			<th>Contests Won</th>
@@ -16,7 +17,7 @@
 			<th>Total Likes Given</th>
 		</tr>
 		{% for user in users %}
-			<tr class="{% cycle 'row1' 'row2' %}">
+			<tr>
 				<td> <a href="{% url 'cryptics:show_user' user.user.id %}">{{ user.user.username }}</a></td>
 				<td>{{ user.contests_won }}</td>
 				<td>{{ user.average_likes }}</td>
@@ -27,4 +28,5 @@
 		{% endfor %}
 	</table>
 	<p><a href="{% url 'cryptics:index' %}">Back</a></p>
+	<script type="text/javascript" src="{% static 'cryptics/js/sort_table.js' %}"></script>
 {% endblock content %}

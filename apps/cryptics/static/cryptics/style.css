@@ -13,6 +13,24 @@
 	background-color: #DDDDDD;
 }
 
+/* Because the sortable table can be reorganized, we'll use pseudoselectors */
+
+.sortable th {
+	cursor: pointer;
+}
+
+.sortable tr:nth-child(2n+2) {
+	background-color: white;
+}
+
+.sortable tr:nth-child(2n+3) {
+	background-color: #DDDDDD;
+}
+
+.sort_column {
+	font-style: italic;
+}
+
 #highlight {
 	background-color: #ccffcc;
 }

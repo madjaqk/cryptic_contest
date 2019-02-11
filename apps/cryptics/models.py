@@ -18,7 +18,7 @@ SUBMISSIONS_LENGTH = datetime.timedelta(days=2, minutes=2)
 VOTING_LENGTH = datetime.timedelta(days=2, minutes=2)
 RECENT_LENGTH = datetime.timedelta(days=7)
 
-SITE_URL = "http://" + Site.objects.get_current().domain
+SITE_URL = "https://" + Site.objects.get_current().domain
 
 class ContestManager(models.Manager):
 	def add(self, word, started_by):

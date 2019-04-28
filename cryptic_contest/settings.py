@@ -150,3 +150,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # URLs for Discord webhooks
 DISCORD_URLS = config("DISCORD_URLS", cast=lambda x: [url.strip() for url in x.split(",")] if x else [], default=[])
+
+# Celery settings
+CELERY_BROKER_URL = config("CELERY_BROKER_URL")
+CELERY_TASK_SERIALIZER = "pickle"
+CELERY_ACCEPT_CONTENT = ("json", "pickle")

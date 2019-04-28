@@ -1,5 +1,4 @@
 import datetime
-import threading
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -9,6 +8,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.template.defaultfilters import pluralize
 
+from . import tasks
 from .utils import to_discord
 
 def to_seconds(td):
@@ -23,8 +23,14 @@ SITE_URL = "https://" + Site.objects.get_current().domain
 class ContestManager(models.Manager):
 	def add(self, word, started_by):
 		new_contest = self.create(word=word.upper(), started_by=started_by)
-		t = threading.Timer(to_seconds(SUBMISSIONS_LENGTH), new_contest.switch_to_voting)
-		t.start()
+		tasks.update_contest_status.apply_async(
+			args=(new_contest,),
+			eta=new_contest.submissions_end_time+datetime.timedelta(seconds=1)
+		)
+		tasks.update_contest_status.apply_async(
+			args=(new_contest,),
+			eta=new_contest.voting_end_time+datetime.timedelta(seconds=1)
+		)
 
 		msg = f"{new_contest.started_by} started a new contest: {new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
 		to_discord(msg)
@@ -112,9 +118,6 @@ class Contest(models.Model):
 		self.refresh_from_db()
 		self.status = self.VOTING
 		self.save()
-
-		t = threading.Timer(to_seconds(VOTING_LENGTH), self.deactivate)
-		t.start()
 
 		msg = f"Voting is now open for {self.word}! {SITE_URL}{self.get_absolute_url()}"
 		to_discord(msg)

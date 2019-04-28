@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.template.defaultfilters import pluralize
 
-from . import tasks
 from .utils import to_discord
 
 def to_seconds(td):
@@ -23,17 +22,11 @@ SITE_URL = "https://" + Site.objects.get_current().domain
 class ContestManager(models.Manager):
 	def add(self, word, started_by):
 		new_contest = self.create(word=word.upper(), started_by=started_by)
-		tasks.update_contest_status.apply_async(
-			args=(new_contest,),
-			eta=new_contest.submissions_end_time+datetime.timedelta(seconds=1)
-		)
-		tasks.update_contest_status.apply_async(
-			args=(new_contest,),
-			eta=new_contest.voting_end_time+datetime.timedelta(seconds=1)
-		)
 
 		msg = f"{new_contest.started_by} started a new contest: {new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
 		to_discord(msg)
+
+		return new_contest
 
 	def ended_recently(self):
 		return self.filter(status=Contest.CLOSED, created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH)).order_by("-created_at")

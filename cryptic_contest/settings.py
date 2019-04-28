@@ -153,5 +153,3 @@ DISCORD_URLS = config("DISCORD_URLS", cast=lambda x: [url.strip() for url in x.s
 
 # Celery settings
 CELERY_BROKER_URL = config("CELERY_BROKER_URL")
-CELERY_TASK_SERIALIZER = "pickle"
-CELERY_ACCEPT_CONTENT = ("json", "pickle")

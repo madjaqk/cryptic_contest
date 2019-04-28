@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -5,6 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, Avg, FloatField
 from django.urls import reverse
 
+from . import tasks
 from .models import User, Contest, Submission
 from .utils import to_discord
 
@@ -24,7 +27,15 @@ def create_contest(request):
 		if Contest.objects.filter(status=Contest.SUBMISSIONS, started_by=request.user):
 			messages.error(request, "Each user can only have one active contest at a time.")
 		else:
-			Contest.objects.add(word=request.POST["word"], started_by=request.user)
+			new_contest = Contest.objects.add(word=request.POST["word"], started_by=request.user)
+			tasks.update_contest_status.apply_async(
+				args=(new_contest.id,),
+				eta=new_contest.submissions_end_time+datetime.timedelta(seconds=1)
+			)
+			tasks.update_contest_status.apply_async(
+				args=(new_contest.id,),
+				eta=new_contest.voting_end_time+datetime.timedelta(seconds=1)
+			)
 	return redirect("cryptics:index")
 
 def show_contest(request, contest_id):

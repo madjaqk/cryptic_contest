@@ -14,5 +14,8 @@ def to_discord(msg):
         "avatar_url": SITE_URL + static("cryptics/images/robot_face.png"),
     }
 
-    for url in settings.DISCORD_URLS:
-        requests.post(f"https://discordapp.com/api/webhooks/{url}", json=payload)
+    if settings.DISCORD_URLS:
+        for url in settings.DISCORD_URLS:
+            requests.post(f"https://discordapp.com/api/webhooks/{url}", json=payload)
+    else:
+        print(payload)

@@ -1,6 +1,6 @@
 import datetime
 
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.urls import reverse
@@ -91,29 +91,42 @@ class Contest(models.Model):
 		return reverse("cryptics:show_contest_full", kwargs=url_kwargs)
 
 	def declare_winner(self):
+		send_message = False
 		if self.submissions.exists():
-			winning_entry = self.submissions.annotate(likes=models.Count("likers")).order_by("-likes", "created_at").first()
-			self.winning_entry = winning_entry
-			self.winning_user = winning_entry.submitted_by
-			self.save()
+			with transaction.atomic():
+				self.refresh_from_db()
+				if self.winning_entry is None:
+					winning_entry = self.submissions.annotate(
+						likes=models.Count("likers")
+					).order_by("-likes", "created_at").first()
+					self.winning_entry = winning_entry
+					self.winning_user = winning_entry.submitted_by
+					self.save()
+					send_message = True
 
+		if send_message:
 			msg = f"Voting is closed for {self.word}!  The winning clue is `{self.winning_entry.clue}`, submitted by {self.winning_entry.submitted_by}.  Congratulations!  {SITE_URL}{self.get_absolute_url()}"
 			to_discord(msg)
 
 	def deactivate(self):
-		self.refresh_from_db()
+		# self.refresh_from_db()
 		self.declare_winner()
 
 		self.status = self.CLOSED
 		self.save()
 
 	def switch_to_voting(self):
-		self.refresh_from_db()
-		self.status = self.VOTING
-		self.save()
+		send_message = False
+		with transaction.atomic():
+			self.refresh_from_db()
+			if self.status == self.SUBMISSIONS:
+				self.status = self.VOTING
+				self.save()
+				send_message = True
 
-		msg = f"Voting is now open for {self.word}! {SITE_URL}{self.get_absolute_url()}"
-		to_discord(msg)
+		if send_message:
+			msg = f"Voting is now open for {self.word}! {SITE_URL}{self.get_absolute_url()}"
+			to_discord(msg)
 
 	def check_if_too_old(self):
 		if self.is_closed:

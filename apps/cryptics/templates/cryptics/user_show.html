@@ -7,15 +7,15 @@
 {% block content %}
 	{% load static %}
 	<h1>{{ this_user.username }}</h1>
-	<p><strong>Contests started:</strong> 
-		{% for contest in this_user.contests_started.all %}
+	<p><strong>Contests started:</strong>
+		{% for contest in this_user.contests_started.all|dictsort:"created_at" %}
 			<a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{ contest.word }}</a>{% if not forloop.last %}, {% endif %}
 		{% empty %}
 			None!
 		{% endfor %}
 	</p>
-	<p><strong>Contests won:</strong> 
-		{% for contest in this_user.contests_won.all %}
+	<p><strong>Contests won:</strong>
+		{% for contest in this_user.contests_won.all|dictsort:"created_at" %}
 			<a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{ contest.word }}</a>{% if not forloop.last %}, {% endif %}
 		{% empty %}
 			None!

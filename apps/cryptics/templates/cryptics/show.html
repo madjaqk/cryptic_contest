@@ -39,6 +39,10 @@
 				{% endif %}
 			</tr>
 			{% for sub in contest.submissions.all|dictsort:sort_order %}
+				{% if sub.id == highlight %}
+					<meta name="twitter:card" content="summary" />
+					<meta name="twitter:title" content="{{sub.clue}}" />
+				{% endif %}
 				<tr class="{% cycle 'row1' 'row2' %}"{% if sub.id == highlight %} id="highlight"{% endif %}>
 					<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}?highlight={{sub.id}}#clue{{sub.id}}">{{sub.id}}</td>
 					<td>{{sub.clue}}</td>

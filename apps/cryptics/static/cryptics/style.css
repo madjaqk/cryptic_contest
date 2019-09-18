@@ -1,3 +1,7 @@
+body {
+	font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
 #header {
 	font-style: italic;
 	border-bottom: 1px solid black;
@@ -14,7 +18,7 @@
 }
 
 .row1 {
-	background-color: white;
+	background-color: transparent;
 }
 
 .row2 {
@@ -28,7 +32,7 @@
 }
 
 .sortable tr:nth-child(2n+2) {
-	background-color: white;
+	background-color: transparent;
 }
 
 .sortable tr:nth-child(2n+3) {

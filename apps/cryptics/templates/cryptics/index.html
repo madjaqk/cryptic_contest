@@ -9,7 +9,7 @@ Puzzlers Club Cryptic Clue Contests
 	{% load humanize %}
 
 	<h1>Cryptics</h1>
-	
+
 	<h3>New Contest</h3>
 	<form action="{% url 'cryptics:create_contest' %}" method="post">
 		{% csrf_token %}
@@ -98,12 +98,23 @@ Puzzlers Club Cryptic Clue Contests
 	{% if past_contests %}
 		<hr>
 		<h3>Past Contests</h3>
-		<ul>
+		<table>
+			<tr>
+				<th>Contest</th>
+				<th>Winning Clue</th>
+				<th>Explanation (hover)</th>
+				<th>Submitted By</th>
+			</tr>
 			{% for contest in past_contests %}
-				<li><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{contest.word}}</a> (ended {{contest.voting_end_time|timesince}} ago)</li>
+				<tr class="{% cycle 'row1' 'row2' %}">
+					<td><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{ contest.word }}</a> (ended {{ contest.voting_end_time|timesince }} ago)</td>
+					<td>{{ contest.winning_entry.clue }}</td>
+					<td{% if user != sub.submitted_by %} class="explanation"{% endif %}>{{ contest.winning_entry.explanation|linebreaksbr }}</td>
+					<td>{{ contest.winning_entry.submitted_by }}</td>
+				</tr>
 			{% endfor %}
-			...
-		</ul>
+		</table>
+		...
 	{% endif %}
 	<p><a href="{% url 'cryptics:all_closed_contests' %}">Full Archives</a></p>
 

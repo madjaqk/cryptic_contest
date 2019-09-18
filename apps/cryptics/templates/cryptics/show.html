@@ -8,6 +8,7 @@
 	{% load static %}
 
 	<h1>{{contest.word}}</h1>
+	<p><em>Started by <a href="{% url 'cryptics:show_user' contest.started_by.id %}">{{contest.started_by}}</a></em></p>
 	{% if contest.is_submissions %}
 		<form action="{% url 'cryptics:create_submission' %}" method="post">
 			{% csrf_token %}

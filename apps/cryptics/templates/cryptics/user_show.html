@@ -34,6 +34,10 @@
 			</tr>
 			{% for sub in this_user.submissions.all|dictsort:"sort_order" %}
 				{% if sub.contest.is_closed or user == this_user %}
+					{% if sub.id == highlight %}
+						<meta name="twitter:card" content="summary" />
+						<meta name="twitter:title" content="{{sub.clue}}" />
+					{% endif %}
 					<tr class="{% cycle 'row1' 'row2' %}"{% if sub.id == highlight %} id="highlight"{% endif %}>
 						<td><a name="clue{{ sub.id }}" href="{% url 'cryptics:show_user' this_user.id %}?highlight={{sub.id}}#clue{{sub.id}}">{{sub.id}}</td>
 						<td><a href="{% url 'cryptics:show_contest_full' sub.contest.id sub.contest.slugified %}">{{sub.contest.word}}</a></td>

@@ -166,7 +166,7 @@ class SubmissionManager(models.Manager):
 			new_sub = Submission(clue=data["clue"], explanation=data["explanation"], contest=contest, submitted_by=user)
 			new_sub.save()
 
-			msg = f"New submission for {new_sub.contest.word} -- {SITE_URL}{new_sub.get_absolute_url()}"
+			msg = f"New submission for {new_sub.contest.word}: {new_sub.clue} -- <{SITE_URL}{new_sub.get_absolute_url()}>"
 			to_discord(msg)
 
 			return {"status": True}

@@ -24,8 +24,11 @@ def index(request):
 @login_required
 def create_contest(request):
 	if request.method == "POST" and request.POST["word"]:
+		max_length = Contest._meta.get_field("word").max_length
 		if Contest.objects.filter(status=Contest.SUBMISSIONS, started_by=request.user):
 			messages.error(request, "Each user can only have one active contest at a time.")
+		elif len(request.POST["word"]) > max_length:
+			messages.error(request, f"Maximum contest length is {max_length} characters; {request.POST['word']} is {len(request.POST['word'])} character long")
 		else:
 			new_contest = Contest.objects.add(word=request.POST["word"], started_by=request.user)
 			tasks.update_contest_status.apply_async(

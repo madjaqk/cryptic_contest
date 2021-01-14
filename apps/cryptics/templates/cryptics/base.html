@@ -13,7 +13,7 @@
 			</div>
 			<div id="header_login">
 				{% if user.is_authenticated %}
-					Hello, <strong>{{user}}</strong>! <a href="{% url 'account_logout' %}">Log out?</a>
+					Hello, <strong><a href="{% url 'cryptics:show_user' user.id %}">{{user}}</a></strong>! <a href="{% url 'account_logout' %}">Log out?</a>
 				{% else %}
 					<a href="{% url 'account_login' %}">Log in</a> to submit clues or contest words.
 				{% endif %}

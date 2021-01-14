@@ -32,7 +32,7 @@ class ContestManager(models.Manager):
 		return self.filter(status=Contest.CLOSED, created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH)).order_by("-created_at")
 
 class Contest(models.Model):
-	word = models.CharField(max_length=50)
+	word = models.CharField(max_length=150)
 	started_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contests_started")
 
 	winning_entry = models.OneToOneField("Submission", on_delete=models.CASCADE, related_name="contest_this_won", null=True, blank=True)

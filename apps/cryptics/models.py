@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.template.defaultfilters import pluralize
 
-from .utils import to_discord
+from .utils import get_discord_pingable_role, to_discord
 
 def to_seconds(td):
 	return td.days*24*60*60 + td.seconds + td.microseconds
@@ -23,7 +23,7 @@ class ContestManager(models.Manager):
 	def add(self, word, started_by):
 		new_contest = self.create(word=word.upper(), started_by=started_by)
 
-		msg = f"{new_contest.started_by} started a new contest: {new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
+		msg = f"{get_discord_pingable_role()}{new_contest.started_by} started a new contest: {new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
 		to_discord(msg)
 
 		return new_contest
@@ -125,7 +125,7 @@ class Contest(models.Model):
 				send_message = True
 
 		if send_message:
-			msg = f"Voting is now open for {self.word}! {SITE_URL}{self.get_absolute_url()}"
+			msg = f"{get_discord_pingable_role()}Voting is now open for {self.word}! {SITE_URL}{self.get_absolute_url()}"
 			to_discord(msg)
 
 	def check_if_too_old(self):
@@ -214,7 +214,11 @@ def sort_users():
 			"average_likes": average_likes
 			})
 
-	# The above for-loop is an ugly mess and probably pretty inefficient.  It seems like it should be possible to accomplish this with the Django ORM and annotate queries, but I couldn't get it to work (specifically, I couldn't wrangle the correct answers for total number of likes of all submissions, and the division added additional wrinkles).  I would love if someone could figure out the "proper" way to achieve this.
+	# The above for-loop is an ugly mess and probably pretty inefficient.  It seems like it should
+	# be possible to accomplish this with the Django ORM and annotate queries, but I couldn't get
+	# it to work (specifically, I couldn't wrangle the correct answers for total number of likes
+	# of all submissions, and the division added additional wrinkles).  I would love if someone
+	# could figure out the "proper" way to achieve this.
 
 	users_list.sort(key=lambda x:(-x["contests_won"], -x["average_likes"]))
 

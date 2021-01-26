@@ -149,7 +149,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # URLs for Discord webhooks
-DISCORD_URLS = config("DISCORD_URLS", cast=lambda x: [url.strip() for url in x.split(",")] if x else [], default=[])
+DISCORD_URL = config("DISCORD_URL", default=None)
+DISCORD_CRYPTIC_CONTEST_ROLE_ID = config("DISCORD_CRYPTIC_CONTEST_ROLE_ID", default=None)
 
 # Celery settings
 CELERY_BROKER_URL = config("CELERY_BROKER_URL")

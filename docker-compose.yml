@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  rabbit:
+    image: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: cryptic_contest
+      RABBITMQ_DEFAULT_PASS: password!
+    ports:
+      - "5672:5672"

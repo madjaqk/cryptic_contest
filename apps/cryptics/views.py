@@ -9,7 +9,6 @@ from django.urls import reverse
 
 from . import tasks
 from .models import User, Contest, Submission
-from .utils import to_discord
 
 def index(request):
 	context = {}

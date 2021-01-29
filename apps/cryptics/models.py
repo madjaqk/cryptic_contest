@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from django.db import models, transaction
 from django.contrib.auth.models import User
@@ -9,6 +10,8 @@ from django.utils.text import slugify
 from django.template.defaultfilters import pluralize
 
 from .utils import get_discord_pingable_role, to_discord
+
+logger = logging.getLogger(__name__)
 
 def to_seconds(td):
 	return td.days*24*60*60 + td.seconds + td.microseconds
@@ -129,11 +132,14 @@ class Contest(models.Model):
 			to_discord(msg)
 
 	def check_if_too_old(self):
+		logger.info("Checking if %s is too old", self.word)
 		if self.is_closed:
 			return None
 		if timezone.now() > self.voting_end_time:
+			logger.info("Closing contest %s", self.word)
 			self.deactivate()
 		elif self.is_submissions and timezone.now() > self.submissions_end_time:
+			logger.info("Switching contest %s to voting")
 			self.switch_to_voting()
 
 class SubmissionManager(models.Manager):

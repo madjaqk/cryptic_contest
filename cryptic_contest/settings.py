@@ -148,6 +148,44 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "{asctime} [{levelname}] {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S"
+        },
+        "verbose": {
+            "format": "{asctime} [{levelname}] {name}:{lineno} {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S"
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "verbose",
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(BASE_DIR, "logs", "cryptics.log"),
+            "formatter": "verbose",
+            "maxBytes": 10_000_000,
+            "backupCount": 5,
+        }
+    },
+    "loggers": {
+        "apps.cryptics": {
+            "handlers": config("LOGGING_HANDLER", cast=lambda x:x.split(","), default=["console"]),
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO")
+        }
+    }
+}
+
 # URLs for Discord webhooks
 DISCORD_URL = config("DISCORD_URL", default=None)
 DISCORD_CRYPTIC_CONTEST_ROLE_ID = config("DISCORD_CRYPTIC_CONTEST_ROLE_ID", default=None)

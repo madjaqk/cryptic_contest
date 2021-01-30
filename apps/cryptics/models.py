@@ -139,7 +139,7 @@ class Contest(models.Model):
 			logger.info("Closing contest %s", self.word)
 			self.deactivate()
 		elif self.is_submissions and timezone.now() > self.submissions_end_time:
-			logger.info("Switching contest %s to voting")
+			logger.info("Switching contest %s to voting", self.word)
 			self.switch_to_voting()
 
 class SubmissionManager(models.Manager):

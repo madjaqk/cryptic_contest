@@ -28,5 +28,6 @@ def to_discord(msg):
 
     if settings.DISCORD_URL:
         requests.post(f"https://discordapp.com/api/webhooks/{settings.DISCORD_URL}", json=payload)
+        logger.info("Sent to Discord %s", payload)
     else:
         print(payload)

@@ -179,7 +179,7 @@ LOGGING = {
         }
     },
     "loggers": {
-        "apps.cryptics": {
+        "": {
             "handlers": config("LOGGING_HANDLER", cast=lambda x:x.split(","), default=["console"]),
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO")
         }

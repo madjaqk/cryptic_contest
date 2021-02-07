@@ -132,7 +132,6 @@ class Contest(models.Model):
 			to_discord(msg)
 
 	def check_if_too_old(self):
-		logger.info("Checking if %s is too old", self.word)
 		if self.is_closed:
 			return None
 		if timezone.now() > self.voting_end_time:

@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 
-from decouple import config
+from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,8 +27,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=lambda x: [host.strip() for host in x.split(",")])
-
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 
 # Application definition
 
@@ -80,11 +79,14 @@ WSGI_APPLICATION = 'cryptic_contest.wsgi.application'
 
 LOGIN_REDIRECT_URL = '/'
 
+SITE_ID = 1
+
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend"
 )
 
+# django-all-auth settings
 SOCIALACCOUNT_PROVIDERS = {
     "discord": {
         "SCOPE": ["identify"],
@@ -92,7 +94,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SITE_ID = 1
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -180,7 +182,7 @@ LOGGING = {
     },
     "loggers": {
         "": {
-            "handlers": config("LOGGING_HANDLER", cast=lambda x:x.split(","), default=["console"]),
+            "handlers": config("LOGGING_HANDLER", cast=Csv(), default=["console"]),
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO")
         }
     }

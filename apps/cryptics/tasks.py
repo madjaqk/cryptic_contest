@@ -1,3 +1,4 @@
+""" Celery tasks for the cryptic module """
 import logging
 
 from celery import shared_task

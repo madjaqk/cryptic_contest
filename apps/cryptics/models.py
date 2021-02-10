@@ -21,10 +21,15 @@ RECENT_LENGTH = datetime.timedelta(days=7)
 SITE_URL = "https://" + Site.objects.get_current().domain
 
 class ContestManager(models.Manager):
+	""" Custom manager for the Contest model """
 	def add(self, word, started_by):
+		""" Create a new contest, post Discord message, and queue Celery tasks """
 		new_contest = self.create(word=word.upper(), started_by=started_by)
 
-		msg = f"{get_discord_pingable_role()}{new_contest.started_by} started a new contest: {new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
+		msg = (
+			f"{get_discord_pingable_role()}{new_contest.started_by} started a new contest: "
+			f"{new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
+		)
 		to_discord(msg)
 
 		tasks.update_contest_status.apply_async(
@@ -39,14 +44,27 @@ class ContestManager(models.Manager):
 		return new_contest
 
 	def ended_recently(self):
-		return self.filter(status=Contest.CLOSED, created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH)).order_by("-created_at")
+		""" Return contests that closed recently """
+		return self.filter(
+			status=Contest.CLOSED,
+			created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH)
+		).order_by("-created_at")
 
 class Contest(models.Model):
+	""" A contest (a word for which cryptic clues should be written) """
 	word = models.CharField(max_length=150)
 	started_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contests_started")
 
-	winning_entry = models.OneToOneField("Submission", on_delete=models.CASCADE, related_name="contest_this_won", null=True, blank=True)
-	winning_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contests_won", null=True, blank=True)
+	winning_entry = models.OneToOneField(
+		"Submission",
+		on_delete=models.CASCADE,
+		related_name="contest_this_won",
+		null=True,
+		blank=True
+	)
+	winning_user = models.ForeignKey(
+		User, on_delete=models.CASCADE, related_name="contests_won", null=True, blank=True
+	)
 
 	SUBMISSIONS = "S"
 	VOTING = "V"
@@ -73,7 +91,8 @@ class Contest(models.Model):
 	def voting_end_time(self):
 		return self.created_at + SUBMISSIONS_LENGTH + VOTING_LENGTH
 
-	# These properties are so that I can check status on templates without hardcoding in `contest.status == "S"` (or whatever)
+	# These properties are so that I can check status on templates without hardcoding in
+	# `contest.status == "S"` (or whatever)
 	@property
 	def is_submissions(self):
 		return self.status == self.SUBMISSIONS
@@ -101,6 +120,7 @@ class Contest(models.Model):
 		return reverse("cryptics:show_contest_full", kwargs=url_kwargs)
 
 	def declare_winner(self):
+		""" Mark the submission with the most votes as the contest's winner and notify Discord """
 		send_message = False
 		if self.submissions.exists():
 			with transaction.atomic():
@@ -115,17 +135,22 @@ class Contest(models.Model):
 					send_message = True
 
 		if send_message:
-			msg = f"Voting is closed for {self.word}!  The winning clue is `{self.winning_entry.clue}`, submitted by {self.winning_entry.submitted_by}.  Congratulations!  {SITE_URL}{self.get_absolute_url()}"
+			msg = (
+				f"Voting is closed for {self.word}!  The winning clue is "
+				f"`{self.winning_entry.clue}`, submitted by {self.winning_entry.submitted_by}.  "
+				f"Congratulations!  {SITE_URL}{self.get_absolute_url()}"
+			)
 			to_discord(msg)
 
 	def deactivate(self):
-		# self.refresh_from_db()
+		""" Declare a winner and close the contest """
 		self.declare_winner()
 
 		self.status = self.CLOSED
 		self.save()
 
 	def switch_to_voting(self):
+		""" Change the phase to voting and notify Discord """
 		send_message = False
 		with transaction.atomic():
 			self.refresh_from_db()
@@ -135,10 +160,14 @@ class Contest(models.Model):
 				send_message = True
 
 		if send_message:
-			msg = f"{get_discord_pingable_role()}Voting is now open for {self.word}! {SITE_URL}{self.get_absolute_url()}"
+			msg = (
+				f"{get_discord_pingable_role()}Voting is now open for {self.word}! "
+				f"{SITE_URL}{self.get_absolute_url()}"
+			)
 			to_discord(msg)
 
 	def check_if_too_old(self):
+		""" Move contest to the next phase if enough time has passed """
 		if self.is_closed:
 			return None
 		if timezone.now() > self.voting_end_time:
@@ -149,21 +178,30 @@ class Contest(models.Model):
 			self.switch_to_voting()
 
 class SubmissionManager(models.Manager):
+	""" Custom manager for the Submission model """
 	def add(self, data, user):
+		""" Validate a clue submission and create it if there are no errors """
 		errors = []
 		if not data["clue"]:
 			errors.append("Clue is required")
 		if not data["explanation"]:
 			errors.append("Explanation is required")
 		if not data["contest_id"]:
-			errors.append("No contest was specified (somehow)")
+			errors.append("No contest was specified")
 		if not user:
-			errors.append("Must be logged in to submit a clue (this specific error shouldn't trigger)")
+			# The create_submission view has @login_required, so it shouldn't be possible for this
+			# specific error to ever trigger
+			errors.append("Must be logged in to submit a clue")
 
+		# Users are required to like at least one clue for every two they submit in order to
+		# encourage participation
 		likes_needed_to_give = user.submissions.count() // 2 - user.clues_liked.count()
 
 		if likes_needed_to_give > 0:
-			errors.append(f"Please like at least {likes_needed_to_give} more clue{pluralize(likes_needed_to_give)}")
+			errors.append(
+				f"Please like at least {likes_needed_to_give} more "
+				f"clue{pluralize(likes_needed_to_give)}"
+			)
 
 		contest = Contest.objects.get(id=data["contest_id"])
 
@@ -174,19 +212,29 @@ class SubmissionManager(models.Manager):
 
 		if errors:
 			return {"status": False, "errors": errors}
-		else:
-			new_sub = Submission(clue=data["clue"], explanation=data["explanation"], contest=contest, submitted_by=user)
-			new_sub.save()
 
-			msg = f"New submission for {new_sub.contest.word}: {new_sub.clue} -- <{SITE_URL}{new_sub.get_absolute_url()}>"
-			to_discord(msg)
+		new_sub = self.create(
+			clue=data["clue"],
+			explanation=data["explanation"],
+			contest=contest,
+			submitted_by=user
+		)
 
-			return {"status": True}
+		msg = (
+			f"New submission for {new_sub.contest.word}: {new_sub.clue} -- "
+			f"<{SITE_URL}{new_sub.get_absolute_url()}>"
+		)
+		to_discord(msg)
+
+		return {"status": True}
 
 class Submission(models.Model):
+	""" A clue submitted to a given contest """
 	clue = models.TextField()
 	explanation = models.TextField()
 	contest = models.ForeignKey(Contest, related_name="submissions", on_delete=models.CASCADE)
+	# TODO: Change the submitted_by on_delete allow clues to continue existing, just with the user
+	# listed as "deleted user" or somesuch
 	submitted_by = models.ForeignKey(User, related_name="submissions", on_delete=models.CASCADE)
 	likers = models.ManyToManyField(User, related_name="clues_liked", blank=True)
 
@@ -196,6 +244,7 @@ class Submission(models.Model):
 	objects = SubmissionManager()
 
 	def sort_order(self):
+		""" This is used to sort submissions on the contest show page. """
 		return (-self.likers.count(), self.created_at)
 
 	def __str__(self):
@@ -206,11 +255,19 @@ class Submission(models.Model):
 			"contest_id": self.contest.id,
 			"word": self.contest.slugified,
 		}
-		return reverse("cryptics:show_contest_full", kwargs=url_kwargs) + f"?highlight={self.id}#clue{self.id}"
+		url = (
+			reverse("cryptics:show_contest_full", kwargs=url_kwargs)
+			+ f"?highlight={self.id}#clue{self.id}"
+		)
+		return url
 
 def sort_users():
-	# sort_users method to monkeypatch into User manager, because it's a built-in I don't have direct access to.
-	# The correct way to do this would have been a proxy model, but this works so not a pressing change.
+	""" Sort users based on the number of contests won and average number of likes
+
+	This function is monkeypatched into the User manager, because it's a built-in I don't have
+	direct access to.  (The correct way to do this would have been a proxy model, but this works
+	so it's not a pressing concern.)
+	"""
 	users = User.objects.all()
 	users_list = []
 	for user in users:

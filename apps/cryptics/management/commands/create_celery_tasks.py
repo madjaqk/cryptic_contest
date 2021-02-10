@@ -1,3 +1,4 @@
+""" Schedule Celery tasks to close currently-open contests """
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand

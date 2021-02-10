@@ -29,15 +29,8 @@ def create_contest(request):
 		elif len(request.POST["word"]) > max_length:
 			messages.error(request, f"Maximum contest length is {max_length} characters; {request.POST['word']} is {len(request.POST['word'])} character long")
 		else:
-			new_contest = Contest.objects.add(word=request.POST["word"], started_by=request.user)
-			tasks.update_contest_status.apply_async(
-				args=(new_contest.id,),
-				eta=new_contest.submissions_end_time+datetime.timedelta(seconds=1)
-			)
-			tasks.update_contest_status.apply_async(
-				args=(new_contest.id,),
-				eta=new_contest.voting_end_time+datetime.timedelta(seconds=1)
-			)
+			Contest.objects.add(word=request.POST["word"], started_by=request.user)
+
 	return redirect("cryptics:index")
 
 def show_contest(request, contest_id):

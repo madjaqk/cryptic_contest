@@ -1,14 +1,13 @@
 import logging
 
-from celery import task
-
-from apps.cryptics.models import Contest
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 
-@task(name="update_contest_status")
+@shared_task(name="update_contest_status")
 def update_contest_status(contest_id):
     """ Change a contest from open to voting or voting to closed """
+    from apps.cryptics.models import Contest
     logger.info("Inside update_contest_status task for ID %d", contest_id)
     try:
         contest = Contest.objects.get(id=contest_id)

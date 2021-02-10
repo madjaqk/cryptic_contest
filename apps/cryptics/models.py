@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.template.defaultfilters import pluralize
 
+from . import tasks
 from .utils import get_discord_pingable_role, to_discord
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,15 @@ class ContestManager(models.Manager):
 
 		msg = f"{get_discord_pingable_role()}{new_contest.started_by} started a new contest: {new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
 		to_discord(msg)
+
+		tasks.update_contest_status.apply_async(
+			args=(new_contest.id,),
+			eta=new_contest.submissions_end_time+datetime.timedelta(seconds=1)
+		)
+		tasks.update_contest_status.apply_async(
+			args=(new_contest.id,),
+			eta=new_contest.voting_end_time+datetime.timedelta(seconds=1)
+		)
 
 		return new_contest
 

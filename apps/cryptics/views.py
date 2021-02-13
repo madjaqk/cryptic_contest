@@ -34,7 +34,7 @@ def create_contest(request):
 			messages.error(
 				request,
 				f"Maximum contest length is {max_length} characters; {request.POST['word']} is "
-				f"{len(request.POST['word'])} character long"
+				f"{len(request.POST['word'])} characters long"
 			)
 		else:
 			Contest.objects.add(word=request.POST["word"], started_by=request.user)

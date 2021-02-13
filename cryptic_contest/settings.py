@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
 import os
+import sys
 
 from decouple import config, Csv
 
@@ -187,6 +187,12 @@ LOGGING = {
 		}
 	}
 }
+
+# Quick hack to disable logging during unittests
+# Taken from https://stackoverflow.com/a/3798131
+# Will cause problems if I ever try to unittest that messages are actually logged
+if "test" in sys.argv:
+    LOGGING["loggers"][""]["level"] = "CRITICAL"
 
 # URLs for Discord webhooks
 DISCORD_URL = config("DISCORD_URL", default=None)

@@ -182,11 +182,11 @@ class SubmissionManager(models.Manager):
 	def add(self, data, user):
 		""" Validate a clue submission and create it if there are no errors """
 		errors = []
-		if not data["clue"]:
+		if not data.get("clue", ""):
 			errors.append("Clue is required")
-		if not data["explanation"]:
+		if not data.get("explanation", ""):
 			errors.append("Explanation is required")
-		if not data["contest_id"]:
+		if not data.get("contest_id", ""):
 			errors.append("No contest was specified")
 		if not user:
 			# The create_submission view has @login_required, so it shouldn't be possible for this

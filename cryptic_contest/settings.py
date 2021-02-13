@@ -183,7 +183,7 @@ LOGGING = {
 	"loggers": {
 		"": {
 			"handlers": config("LOGGING_HANDLER", cast=Csv(), default=["console"]),
-			"level": os.getenv("DJANGO_LOG_LEVEL", "INFO")
+			"level": config("DJANGO_LOG_LEVEL", default="INFO")
 		}
 	}
 }
@@ -192,7 +192,7 @@ LOGGING = {
 # Taken from https://stackoverflow.com/a/3798131
 # Will cause problems if I ever try to unittest that messages are actually logged
 if "test" in sys.argv:
-    LOGGING["loggers"][""]["level"] = "CRITICAL"
+	LOGGING["loggers"][""]["level"] = "CRITICAL"
 
 # URLs for Discord webhooks
 DISCORD_URL = config("DISCORD_URL", default=None)

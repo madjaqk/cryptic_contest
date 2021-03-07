@@ -22,7 +22,8 @@ I've learned about Django in the years since I started this project, so there ar
 would be nice.
 
 * Replace the hand-written data validation in `cryptics/views.py` and `cryptics/models.py` with 
-    Django forms.
+    Django forms, and possibly replace the view functions with class-based views that have 
+    form-handling baked in.
 * Replace the default `django.contrib.auth.models` User with a custom model.  (Note that per the 
     docs [changing the User model for an existing project][new User model] is quite messy, so 
     unfortunately this might not be worth the effort, unfortunately.)
@@ -32,6 +33,18 @@ would be nice.
     question, causing Celery to immediately fail silently.  I was able to use [`setfacl`] to fix 
     the issue in the short-term, but a better solution would be to create a dedicated `cryptic` 
     group on the server or to switch to `syslog`-based logging (or both).
+* I feel like production site is kind of sluggish, so I'd like to do some profiling--there's a 
+    decent chance that some of the SQL queries can be optimized without affecting functionality.
+
+## Deployment
+
+This is as much a reminder for me as anyone else.
+
+1. Tag current version and push to GitHub (something like `git tag v1.0`, `git push --tags`)
+2. `git pull` on the server
+3. `systemctl --signal SIGHUP kill gunicorn` (and also `... celery` if the change affects the 
+    Celery tasks, which at the moment would just be things that touch the 
+    `Contest.check_if_too_old` method)
 
 ## License
 

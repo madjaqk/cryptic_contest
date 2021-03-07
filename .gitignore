@@ -2,6 +2,7 @@
 __pycache__
 db.sqlite3
 .env
+prod.env
 django_env
 /static
 .vscode/

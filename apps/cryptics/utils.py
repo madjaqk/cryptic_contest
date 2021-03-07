@@ -22,7 +22,7 @@ def to_discord(msg):
 	""" Simple util to post messages to Discord
 
 	Arguably, this should be moved to a Celery task so that the message can be sent to Discord
-	outside of the normal request/response cycle, but so far there hasn't been an issue.
+	asynchronously, but so far there hasn't been an issue.
 	"""
 	payload = {
 		"content": msg,

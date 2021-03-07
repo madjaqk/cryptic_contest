@@ -9,7 +9,7 @@
 	<body>
 		<div id="header">
 			<div id="header_links">
-				<a href="{% url 'cryptics:index' %}">Home</a> | <a href="{% url 'cryptics:all_users' %}">User Stats</a>
+				<a href="{% url 'cryptics:index' %}">Home</a> | <a href="{% url 'cryptics:about' %}">About</a> | <a href="{% url 'cryptics:all_users' %}">User Stats</a>
 			</div>
 			<div id="header_login">
 				{% if user.is_authenticated %}

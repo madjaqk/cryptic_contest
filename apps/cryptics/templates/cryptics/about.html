@@ -1,0 +1,34 @@
+{% extends "./base.html" %}
+
+{% block title %}
+Puzzlers Club Cryptic Clue Contests
+{% endblock title %}
+
+{% block content %}
+    <h1>About</h1>
+
+    <p>This website runs contests for writing cryptic crossword clues.</p>
+
+    <h3>What's a cryptic crossword clue?</h3>
+
+    <p>A <a href="https://en.wikipedia.org/wiki/Cryptic_crossword">cryptic crossword</a> is a type of word puzzle generally popular in the United Kingdom and other Commonwealth nations (though they've been making in-roads in the United States and elsewhere).  The central gimmick is that rather than each clue simply being a straight definition as in American crosswords ("Loud chewing, maybe" for PET PEEVE), in a cryptic crossword each clue contains both a definition and some form of wordplay indicating the answer ("Special annoyance: Dog or cat at gym the day before (3, 5)" for <a href="https://cryptics.jackbrounstein.com/contest/4-pet-peeve-3-5?highlight=28#clue28">PET PEEVE</a>).  A large number of conventions about what is and is not considered valid cluing have developed over the nearly 100 years since the form was introduced; Deusovi from the Puzzling Stack Exchange has a very good, thorough <a href="https://puzzling.stackexchange.com/questions/45984/cryptic-clue-guide">guide</a> to the specifics.</p>
+
+    <h3>How does it work?</h3>
+
+    <p>You can create a contest on the main page; I'd personally prefer if a contest is for a word or phrase that could possibly be an answer in an actual crossword, some of the more popular contests have been <a href="https://cryptics.jackbrounstein.com/contest/158-something-with-definition-word">somewhat</a> <a href="https://cryptics.jackbrounstein.com/contest/182-any-clue-incorporating-a-song-title">looser</a>.  Each person can only have one open contest at a time to cut down on spam.</p>
+
+    <p>A contest stays open for two days during which anyone can submit a cryptic clue and explanation.  Submitting a clue for a contest you opened is completely fine, but please only do so for clues that you wrote after the contest started--the opposite, starting a contest as a way to show off a clever clue you thought of, is considered in poor taste and somewhat unsporting.  Do note that to encourage participation (and again to limit spam), the total number of clues you can submit is capped based on the number of other people's clues you've voted for (see below); specifically, you must star at least one other clue for every two clues you've submitted.</p>
+
+    <p>After a contest has been open for two days, it switches to the voting period.  Click the star next to any clue to vote for it; note that you can vote for any number of clues in a contest.  (That is to say, this is an <a href="https://en.wikipedia.org/wiki/Approval_voting">approval voting</a> system, or, alternately, the process is more akin to liking posts on Facebook than electing a President.)  The voting period also lasts two days, at which time whichever clue has the most stars (with submitted earliest as the tiebreaker) is crowned the champion.</p>
+
+    <h3>What are some other clue-writing contests?</h3>
+
+    <p>I cut my teeth on the <a href="http://www.ukpuzzle.com/phpBB3/index.php">DIY COW</a> clue-writing contests; note that their set-up is that whoever wins the weekly contest has to judge the following week, which is a very large undertaking indeed.  Britain's <em>The Observer</em>, runs a monthly clue-writing contest (known as the "Azed slip", after the paper's crossword constructor); I've never entered, but you can read the archives <a href="http://www.andlit.org.uk/azed/slip_search.php">here</a>.
+
+    <h3>What does the source code look like?</h3>
+
+    <p>You can see the code for this website on <a href="https://github.com/madjaqk/cryptic_contest">GitHub</a>.</p>
+
+    <p><a href="{% url 'cryptics:index' %}">Back to home</a>
+
+{% endblock content %}

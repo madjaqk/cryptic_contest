@@ -23,6 +23,10 @@ def index(request):
 
 	return render(request, "cryptics/index.html", context)
 
+def about(request):
+	""" Show the about page """
+	return render(request, "cryptics/about.html")
+
 @login_required
 def create_contest(request):
 	""" Let a user create a new contest """

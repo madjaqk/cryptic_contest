@@ -5,6 +5,7 @@ app_name = "cryptics"
 
 urlpatterns = [
 	path("", views.index, name="index"),
+	path("about", views.about, name="about"),
 	path("create_contest", views.create_contest, name="create_contest"),
 	path("contest/<int:contest_id>", views.show_contest, name="show_contest"),
 	path("contest/<int:contest_id>-<word>", views.show_contest_full, name="show_contest_full"),

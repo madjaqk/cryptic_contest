@@ -20,7 +20,7 @@
 			<tr>
 				<td> <a href="{% url 'cryptics:show_user' user_data.user.id %}">{{ user_data.user.username }}</a></td>
 				<td>{{ user_data.contests_won }}</td>
-				<td>{{ user_data.average_likes }}</td>
+				<td>{{ user_data.average_likes|floatformat:-3 }}</td>
 				<td>{{ user_data.total_submissions }}</td>
 				<td>{{ user_data.total_likes }}</td>
 				<td>{{ user_data.clues_liked }}</td>

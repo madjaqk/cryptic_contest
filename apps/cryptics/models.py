@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from django.db import models, transaction
+from django.db.models import Count
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.urls import reverse
@@ -267,27 +268,38 @@ def sort_users():
 	This function is monkeypatched into the User manager, because it's a built-in I don't have
 	direct access to.  (The correct way to do this would have been a proxy model, but this works
 	so it's not a pressing concern.)
+
+	For people (such as me in the future) who wonder why this only annotates the total number of
+	likes rather all of the fields: It turns out there's a longstanding Django issue about
+	multiple annotations that causes them to report the wrong values--effectively,
+	Model.objects.annotate(a_count=Count("a"), b_count=Count("b")) ends up reporting both a_count
+	and b_count as a*b.  The simplest workaround is to use distinct=True inside the count, but
+	that doesn't work for counting total number of likes received--it results in the total number
+	of users who have liked _any_ clue from this user, not a total of likes they've received
+	across every clue.  There are more complicated workarounds using subqueries, but I didn't have
+	luck with them and what's below already gives a 20x speed-up over what I had before, so I
+	don't think it's pressing.
+
+	Django ticket here: https://code.djangoproject.com/ticket/10060
 	"""
-	users = User.objects.all()
+	users = User.objects.annotate(
+		total_likes=Count("submissions__likers")
+	).prefetch_related("contests_won", "submissions", "clues_liked")
 	users_list = []
 	for user in users:
 		contests_won = user.contests_won.all().count()
 		total_submissions = user.submissions.all().count()
-		total_likes = sum(sub.likers.all().count() for sub in user.submissions.all())
+		total_likes = user.total_likes
 		average_likes = total_likes/total_submissions if total_submissions else 0
+		clues_liked = user.clues_liked.count()
 		users_list.append({
 			"user": user,
 			"contests_won": contests_won,
 			"total_submissions": total_submissions,
 			"total_likes": total_likes,
-			"average_likes": average_likes
-			})
-
-	# The above for-loop is an ugly mess and probably pretty inefficient.  It seems like it should
-	# be possible to accomplish this with the Django ORM and annotate queries, but I couldn't get
-	# it to work (specifically, I couldn't wrangle the correct answers for total number of likes
-	# of all submissions, and the division added additional wrinkles).  I would love if someone
-	# could figure out the "proper" way to achieve this.
+			"average_likes": average_likes,
+			"clues_liked": clues_liked,
+		})
 
 	users_list.sort(key=lambda x:(-x["contests_won"], -x["average_likes"]))
 

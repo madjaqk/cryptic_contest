@@ -136,7 +136,6 @@ class CreateSubmissionTestCase(TestCase):
 
 		self.url = reverse("cryptics:create_submission")
 
-
 	@mock.patch("apps.cryptics.models.to_discord")
 	def test_create_submission_succeeds(self, mock_discord):
 		""" Creating a submission succeeds with valid data """

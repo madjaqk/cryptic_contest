@@ -137,8 +137,8 @@ class Contest(models.Model):
 
 		if send_message:
 			msg = (
-				f"Voting is closed for {self.word}!  The winning clue is "
-				f"`{self.winning_entry.clue}`, submitted by {self.winning_entry.submitted_by}.  "
+				f"Voting is closed for {self.word}!  The winning clue is:\n"
+				f"**{self.winning_entry.clue}**\nSubmitted by {self.winning_entry.submitted_by}.  "
 				f"Congratulations!  {SITE_URL}{self.get_absolute_url()}"
 			)
 			to_discord(msg)

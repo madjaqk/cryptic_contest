@@ -137,7 +137,7 @@ class Contest(models.Model):
 
 		if send_message:
 			msg = (
-				f"Voting is closed for {self.word}!  The winning clue is:\n"
+				f"Voting is closed for ||{self.word}||!  The winning clue is:\n"
 				f"**{self.winning_entry.clue}**\nSubmitted by {self.winning_entry.submitted_by}.  "
 				f"Congratulations!  {SITE_URL}{self.get_absolute_url()}"
 			)
@@ -222,7 +222,7 @@ class SubmissionManager(models.Manager):
 		)
 
 		msg = (
-			f"New submission for {new_sub.contest.word}: {new_sub.clue} -- "
+			f"New submission for ||{new_sub.contest.word}||: {new_sub.clue} -- "
 			f"<{SITE_URL}{new_sub.get_absolute_url()}>"
 		)
 		to_discord(msg)

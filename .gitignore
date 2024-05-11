@@ -9,3 +9,4 @@ django_env
 .venv
 logs/*
 scratch.py
+.idea

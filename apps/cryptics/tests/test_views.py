@@ -12,6 +12,7 @@ from django.urls import reverse
 
 from ..models import Contest, Submission
 
+
 class CreateContestTestCase(TestCase):
 	""" Test the create_contest view """
 	def setUp(self):
@@ -105,6 +106,7 @@ class CreateContestTestCase(TestCase):
 		mock_task.assert_any_call(args=(contest.id,), eta=contest.submissions_end_time+one_sec)
 		mock_task.assert_any_call(args=(contest.id,), eta=contest.voting_end_time+one_sec)
 
+
 class ShowContestTestCase(TestCase):
 	""" Test the show_contest and show_contest_full views """
 	def test_show_contest_checks_if_too_old(self):
@@ -121,6 +123,7 @@ class ShowContestTestCase(TestCase):
 
 		old_contest.refresh_from_db()
 		self.assertEqual(old_contest.status, Contest.CLOSED)
+
 
 class CreateSubmissionTestCase(TestCase):
 	""" Test the create_submission view """

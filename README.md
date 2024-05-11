@@ -26,7 +26,7 @@ would be nice.
     form-handling baked in.
 * Replace the default `django.contrib.auth.models` User with a custom model.  (Note that per the 
     docs [changing the User model for an existing project][new User model] is quite messy, so 
-    unfortunately this might not be worth the effort, unfortunately.)
+    this might not be worth the effort, unfortunately.)
 * Add significantly more unit testing, and possibly Travis/GitHub Actions/some other CI system.
 * In production, this uses Python's `logging.handlers.RotatingFileHandler` for logging, but there 
     was an issue that the `celery` user by default didn't have permission to write to the file in 

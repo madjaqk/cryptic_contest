@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from ..models import Contest, Submission
 
+
 class UsersTestCase(TestCase):
     """ Test the custom functions on the User model and manager """
     def setUp(self):

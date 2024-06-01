@@ -10,13 +10,9 @@
 	<h1>{{contest.word}}</h1>
 	<p><em>Started by <a href="{% url 'cryptics:show_user' contest.started_by.id %}">{{contest.started_by}}</a></em></p>
 	{% if contest.is_submissions %}
-		<form action="{% url 'cryptics:create_submission' %}" method="post">
+		<form action="" method="post">
 			{% csrf_token %}
-			<input type="hidden" name="contest_id" value="{{ contest.id }}">
-			<p>Clue: <input type="text" name="clue" id="new_submission" size="60"></p>
-			<p class="warning" id="enum_warning">Your clue should include the enumeration.</p>
-			<p>Explanation:</p>
-			<p><textarea rows=4 cols=40 name="explanation"></textarea></p>
+			{{ form }}
 			<input type="submit" value="Submit">
 		</form>
 	{% endif %}
@@ -39,7 +35,7 @@
 					<th>Likes</th>
 				{% endif %}
 			</tr>
-			{% for sub in contest.submissions.all|dictsort:sort_order %}
+			{% for sub in contest.submissions_sorted %}
 				{% if sub.id == highlight %}
 					<meta name="twitter:card" content="summary" />
 					<meta name="twitter:title" content="{{sub.clue}}" />

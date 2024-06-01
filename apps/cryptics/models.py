@@ -4,14 +4,12 @@ import logging
 from django.db import models, transaction
 from django.db.models import Count
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-from django.template.defaultfilters import pluralize
 
 from . import tasks
-from .utils import get_discord_pingable_role, to_discord
+from .utils import get_discord_pingable_role, get_site_url, to_discord
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +17,6 @@ SUBMISSIONS_LENGTH = datetime.timedelta(days=2, minutes=2)
 VOTING_LENGTH = datetime.timedelta(days=2, minutes=2)
 RECENT_LENGTH = datetime.timedelta(days=7)
 
-SITE_URL = "https://" + Site.objects.get_current().domain
 
 class ContestManager(models.Manager):
 	""" Custom manager for the Contest model """
@@ -29,7 +26,7 @@ class ContestManager(models.Manager):
 
 		msg = (
 			f"{get_discord_pingable_role()}{new_contest.started_by} started a new contest: "
-			f"{new_contest.word} -- {SITE_URL}{new_contest.get_absolute_url()}"
+			f"{new_contest.word} -- {get_site_url()}{new_contest.get_absolute_url()}"
 		)
 		to_discord(msg)
 
@@ -50,6 +47,7 @@ class ContestManager(models.Manager):
 			status=Contest.CLOSED,
 			created_at__gt=timezone.now()-(SUBMISSIONS_LENGTH+VOTING_LENGTH+RECENT_LENGTH)
 		).order_by("-created_at")
+
 
 class Contest(models.Model):
 	""" A contest (a word for which cryptic clues should be written) """
@@ -83,6 +81,9 @@ class Contest(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 	objects = ContestManager()
+
+	class Meta:
+		ordering = ["created_at"]
 
 	@property
 	def submissions_end_time(self):
@@ -120,6 +121,19 @@ class Contest(models.Model):
 		}
 		return reverse("cryptics:show_contest_full", kwargs=url_kwargs)
 
+	def submissions_sorted(self):
+		""" Return submissions sorted by like count if a contest is closed, creation date otherwise """
+		submissions = self.submissions.select_related("submitted_by")
+		if self.is_closed:
+			return submissions.prefetch_related(
+				"likers"
+			).annotate(
+				like_count=Count("likers")
+			).order_by(
+				"-like_count", "created_at"
+			)
+		return submissions.order_by("created_at")
+
 	def declare_winner(self):
 		""" Mark the submission with the most votes as the contest's winner and notify Discord """
 		send_message = False
@@ -129,7 +143,9 @@ class Contest(models.Model):
 				if self.winning_entry is None:
 					winning_entry = self.submissions.annotate(
 						likes=models.Count("likers")
-					).order_by("-likes", "created_at").first()
+					).order_by(
+						"-likes", "created_at"
+					).first()
 					self.winning_entry = winning_entry
 					self.winning_user = winning_entry.submitted_by
 					self.save()
@@ -139,7 +155,7 @@ class Contest(models.Model):
 			msg = (
 				f"Voting is closed for {self.word}!  The winning clue is:\n"
 				f"**{self.winning_entry.clue}**\nSubmitted by {self.winning_entry.submitted_by}.  "
-				f"Congratulations!  {SITE_URL}{self.get_absolute_url()}"
+				f"Congratulations!  {get_site_url()}{self.get_absolute_url()}"
 			)
 			to_discord(msg)
 
@@ -163,7 +179,7 @@ class Contest(models.Model):
 		if send_message:
 			msg = (
 				f"{get_discord_pingable_role()}Voting is now open for {self.word}! "
-				f"{SITE_URL}{self.get_absolute_url()}"
+				f"{get_site_url()}{self.get_absolute_url()}"
 			)
 			to_discord(msg)
 
@@ -178,63 +194,46 @@ class Contest(models.Model):
 			logger.info("Switching contest %s to voting", self.word)
 			self.switch_to_voting()
 
+
+class SubmissionQuerySet(models.query.QuerySet):
+	def order_by_like_count(self, *, reverse=False):
+		""" Order submissions by number of likes (default descending).
+
+		This will also annotate the queryset with like count and select/prefetch related fields. """
+		submissions = self.select_related("contest").prefetch_related("likers")
+
+		if reverse:
+			sort_fields = ("like_count", "created_at")
+		else:
+			sort_fields = ("-like_count", "created_at")
+
+		return submissions.annotate(like_count=models.Count("likers")).order_by(*sort_fields)
+
+
 class SubmissionManager(models.Manager):
 	""" Custom manager for the Submission model """
-	def add(self, data, user):
+	def get_queryset(self):
+		return SubmissionQuerySet(self.model, using=self._db)
+
+	def add(self, clue: str, explanation: str, contest: Contest, submitted_by: User):
 		""" Validate a clue submission and create it if there are no errors """
-		errors = []
-		if not data.get("clue", ""):
-			errors.append("Clue is required")
-		if not data.get("explanation", ""):
-			errors.append("Explanation is required")
-		if not data.get("contest_id", ""):
-			errors.append("No contest was specified")
-		if not user:
-			# The create_submission view has @login_required, so it shouldn't be possible for this
-			# specific error to ever trigger
-			errors.append("Must be logged in to submit a clue")
-
-		# Users are required to like at least one clue for every two they submit in order to
-		# encourage participation
-		likes_needed_to_give = user.submissions.count() // 2 - user.clues_liked.count()
-
-		if likes_needed_to_give > 0:
-			errors.append(
-				f"Please like at least {likes_needed_to_give} more "
-				f"clue{pluralize(likes_needed_to_give)}"
-			)
-
-		contest = Contest.objects.get(id=data["contest_id"])
-
-		contest.check_if_too_old()
-
-		if not contest.is_submissions:
-			errors.append("Sorry, this contest has closed")
-
-		if errors:
-			return {"status": False, "errors": errors}
-
-		new_sub = self.create(
-			clue=data["clue"],
-			explanation=data["explanation"],
-			contest=contest,
-			submitted_by=user
-		)
+		new_sub = self.create(clue=clue, explanation=explanation, contest=contest, submitted_by=submitted_by)
 
 		msg = (
 			f"New submission for {new_sub.contest.word}: {new_sub.clue} -- "
-			f"<{SITE_URL}{new_sub.get_absolute_url()}>"
+			f"<{get_site_url()}{new_sub.get_absolute_url()}>"
 		)
 		to_discord(msg)
 
-		return {"status": True}
+		return new_sub
+
 
 class Submission(models.Model):
 	""" A clue submitted to a given contest """
 	clue = models.TextField()
 	explanation = models.TextField()
 	contest = models.ForeignKey(Contest, related_name="submissions", on_delete=models.CASCADE)
-	# TODO: Change the submitted_by on_delete allow clues to continue existing, just with the user
+	# TODO: Change the submitted_by on_delete to allow clues to continue existing, just with the user
 	# listed as "deleted user" or somesuch
 	submitted_by = models.ForeignKey(User, related_name="submissions", on_delete=models.CASCADE)
 	likers = models.ManyToManyField(User, related_name="clues_liked", blank=True)
@@ -244,6 +243,10 @@ class Submission(models.Model):
 
 	objects = SubmissionManager()
 
+	class Meta:
+		ordering = ["created_at"]
+
+	@property
 	def sort_order(self):
 		""" This is used to sort submissions on the contest show page. """
 		return (-self.likers.count(), self.created_at)
@@ -262,10 +265,11 @@ class Submission(models.Model):
 		)
 		return url
 
+
 def sort_users():
 	""" Sort users based on the number of contests won and average number of likes
 
-	This function is monkeypatched into the User manager, because it's a built-in I don't have
+	This function is monkey patched into the User manager, because it's a built-in I don't have
 	direct access to.  (The correct way to do this would have been a proxy model, but this works
 	so it's not a pressing concern.)
 
@@ -301,8 +305,9 @@ def sort_users():
 			"clues_liked": clues_liked,
 		})
 
-	users_list.sort(key=lambda x:(-x["contests_won"], -x["average_likes"]))
+	users_list.sort(key=lambda x: (-x["contests_won"], -x["average_likes"]))
 
 	return users_list
+
 
 User.objects.sort_users = sort_users

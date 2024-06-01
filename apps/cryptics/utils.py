@@ -1,22 +1,27 @@
 """ Utility functions for the cryptics module """
 import logging
+from functools import cache
 
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.contrib.staticfiles.templatetags.staticfiles import static
-
+from django.templatetags.static import static
 import requests
 
 logger = logging.getLogger(__name__)
 
-SITE_URL = "https://" + Site.objects.get_current().domain
+
+@cache
+def get_site_url():
+	return "https://" + Site.objects.get_current().domain
+
 
 def get_discord_pingable_role():
-	""" Get the Discord role ID from settings (if its defined) and format it appropriately """
+	""" Get the Discord role ID from settings (if it's defined) and format it appropriately """
 	if settings.DISCORD_CRYPTIC_CONTEST_ROLE_ID:
 		return f"<@&{settings.DISCORD_CRYPTIC_CONTEST_ROLE_ID}> "
 
 	return ""
+
 
 def to_discord(msg):
 	""" Simple util to post messages to Discord
@@ -27,7 +32,7 @@ def to_discord(msg):
 	payload = {
 		"content": msg,
 		"username": "Machine to steal books (5)",
-		"avatar_url": SITE_URL + static("cryptics/images/robot_face.png"),
+		"avatar_url": get_site_url() + static("cryptics/images/robot_face.png"),
 	}
 
 	if settings.DISCORD_URL:

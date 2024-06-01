@@ -51,6 +51,7 @@ MIDDLEWARE = [
 	"django.contrib.auth.middleware.AuthenticationMiddleware",
 	"django.contrib.messages.middleware.MessageMiddleware",
 	"django.middleware.clickjacking.XFrameOptionsMiddleware",
+	"allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "cryptic_contest.urls"
@@ -101,10 +102,12 @@ DATABASES = {
 		"NAME": config("DB_NAME", default=os.path.join(BASE_DIR, "db.sqlite3")),
 		"USER": config("DB_USER", default=None),
 		"PASSWORD": config("DB_PASSWORD", default=None),
-		"HOST": "localhost",
+		"HOST": config("DB_HOST", default="localhost"),
 		"PORT": "",
 	}
 }
+
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 
 # Password validation

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project 
 adheres roughly to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2024-05-31
+
+* FEAT: Use built-in Django forms rather than rolling my own
+* FEAT: Add "Check for repeats" link to contest create form
+* FEAT: Added new `contest_search_json` view, which returns a JSON of matching contests.  (Currently, this is only used for the "Check for repeats" link.)
+* FIX: Use `select_related`, `prefetch_related`, and generally smarter queries to greatly speed up many views, most notably the full archive view
+* FIX: The auto-enumeration option for new contests will now include non-ASCII letters and ASCII digits in the enumeration.  (That is, `ÉPÉE` and `R2D2` will now both auto-enumerate to `(4)` instead of `(2)`.)
+
 ## [1.1.0] - 2022-01-24
 
 * FIX: Use a more efficient query to generate stats, greatly reducing load time

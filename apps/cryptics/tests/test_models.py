@@ -12,21 +12,21 @@ class UsersTestCase(TestCase):
         self.user2 = User.objects.create_user(username="second_user", password="password")
         self.user3 = User.objects.create_user(username="third_user", password="password")
 
-        contest = Contest.objects.create(
+        self.contest = Contest.objects.create(
             word="EXAMPLE CONTEST (7, 7)", started_by=self.user1, status=Contest.CLOSED
         )
         sub1 = Submission.objects.create(
-            clue="Clue 1 (7, 7)", contest=contest, submitted_by=self.user3
+            clue="Clue 1 (7, 7)", contest=self.contest, submitted_by=self.user3
         )
         sub2 = Submission.objects.create(
-            clue="Clue 2 (7, 7)", contest=contest, submitted_by=self.user3
+            clue="Clue 2 (7, 7)", contest=self.contest, submitted_by=self.user3
         )
         sub3 = Submission.objects.create(
-            clue="Clue 3 (7, 7)", contest=contest, submitted_by=self.user2
+            clue="Clue 3 (7, 7)", contest=self.contest, submitted_by=self.user2
         )
-        contest.winning_submission = sub3
-        contest.winning_user = self.user3
-        contest.save()
+        self.contest.winning_submission = sub3
+        self.contest.winning_user = self.user3
+        self.contest.save()
 
         sub1.likers.add(self.user1, self.user2)
         sub2.likers.add(self.user2)

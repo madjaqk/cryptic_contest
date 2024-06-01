@@ -19,7 +19,7 @@
 		{% for contest in contests %}
 			<tr class="{% cycle 'row1' 'row2' %}">
 				<td><a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{contest.word}}</a></td>
-				<td><a href="{% url 'cryptics:show_user' contest.started_by.id %}">{{ contest.started_by }}</td>
+				<td><a href="{% url 'cryptics:show_user' contest.started_by.id %}">{{ contest.started_by }}</a></td>
 				<td>{{ contest.created_at }}</td>
 				{% if contest.winning_entry %}
 					<td><a href="{% url 'cryptics:show_user' contest.winning_user.id %}">{{ contest.winning_user }}</a></td>

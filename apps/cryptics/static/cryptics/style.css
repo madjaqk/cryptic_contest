@@ -76,3 +76,8 @@ p.warning {
 	font-weight: bold;
 	display: none;
 }
+
+span.warning {
+	color: red;
+	font-weight: bold;
+}

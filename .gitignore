@@ -8,5 +8,6 @@ django_env
 .vscode/
 .venv
 logs/*
+!logs/.gitkeep
 scratch.py
 .idea

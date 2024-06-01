@@ -1,0 +1,12 @@
+{{ errors }}
+{{ form.contest.errors }}
+{{ form.submitted_by.errors }}
+<div{% with classes=field.css_classes %}{% if classes %} class="{{ classes }}"{% endif %}{% endwith %}>
+    {{ form.clue.as_field_group }}
+    <p class="warning" id="enum_warning">Your clue should include the enumeration.</p>
+</div>
+<div{% with classes=field.css_classes %}{% if classes %} class="{{ classes }}"{% endif %}{% endwith %}>
+    <p>{{ form.explanation.label_tag }}</p>
+    {{ form.explanation.errors }}
+    {{ form.explanation }}
+</div>

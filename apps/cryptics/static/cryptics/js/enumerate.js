@@ -1,23 +1,24 @@
-function enumerate(clue){
+function enumerate(word){
 	let symbols_in_enumeration = {
 		"-": true,
 		".": true,
 		"/": true,
 		"!": true,
 	}
-	clue = clue.toUpperCase().replace(/\s*\(.*\)\s*$/, "")
+	word = word.toUpperCase().replace(/\s*\(.*\)\s*$/, "")  // Remove an existing enumeration if present
 	let output = ""
 	let count = 0
-	for(let i = 0; i < clue.length; i++){
-		if(clue.charCodeAt(i) >= 65 && clue.charCodeAt(i) <= 90){
+	for(let i = 0; i < word.length; i++){
+	    // This regex should, fingers-crossed, match any unicode letter or ASCII digit
+		if(/[\p{L}\d]/u.test(word.charAt(i))){
 			count++
-		} else if(symbols_in_enumeration[clue[i]]) {
+		} else if(symbols_in_enumeration[word[i]]) {
 			if(count > 0){
 				output += count
 			}
-			output += clue[i]
+			output += word[i]
 			count = 0
-		} else if(clue[i] == " ") {
+		} else if(word[i] == " ") {
 			if(count > 0){
 				output += count + ","
 			}
@@ -34,7 +35,7 @@ function enumerate(clue){
 
 	output = output.replace(/\D*$/, "")
 
-	return clue + " (" + output + ")"
+	return word + " (" + output + ")"
 }
 
 document.getElementById("enumerate_link").addEventListener("click", function(e){

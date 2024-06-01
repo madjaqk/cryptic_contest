@@ -1,0 +1,3 @@
+This is a dummy file so that Git will track this directory; Django requires the directory to exist for the logging to work, but the actual logs don't need to be tracked.
+
+https://stackoverflow.com/a/7229996

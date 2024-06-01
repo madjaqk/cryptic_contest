@@ -1,0 +1,9 @@
+{% load static %}
+{{ errors }}
+{{ form.started_by.errors }}
+<div{% with classes=field.css_classes %}{% if classes %} class="{{ classes }}"{% endif %}{% endwith %}>
+    {{ form.word.as_field_group }}
+    <br><a href="#" id="enumerate_link">Auto-enumerate</a> <a href="#" id="repeats_link">Check for repeats</a> <span id="repeats_target"></span>
+</div>
+<script type="text/javascript" src="{% static 'cryptics/js/enumerate.js' %}"></script>
+<script type="text/javascript" src="{% static 'cryptics/js/check_for_repeats.js' %}"></script>

@@ -8,14 +8,14 @@
 	{% load static %}
 	<h1>{{ this_user.username }}</h1>
 	<p><strong>Contests started:</strong>
-		{% for contest in this_user.contests_started.all|dictsort:"created_at" %}
+		{% for contest in this_user.contests_started.all %}
 			<a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{ contest.word }}</a>{% if not forloop.last %}, {% endif %}
 		{% empty %}
 			None!
 		{% endfor %}
 	</p>
 	<p><strong>Contests won:</strong>
-		{% for contest in this_user.contests_won.all|dictsort:"created_at" %}
+		{% for contest in this_user.contests_won.all %}
 			<a href="{% url 'cryptics:show_contest_full' contest.id contest.slugified %}">{{ contest.word }}</a>{% if not forloop.last %}, {% endif %}
 		{% empty %}
 			None!
@@ -32,7 +32,13 @@
 				<th>Submitted By</th>
 				<th>Likes</th>
 			</tr>
-			{% for sub in this_user.submissions.all|dictsort:"sort_order" %}
+			{% comment %}
+				Note that this needs to be this_user.submissions.all.order_by_like_count, not just
+				this_user.submissions.order_by_like_count.  order_by_like_count is a method of the SubmissionQuerySet;
+				this_user.submissions alone will return a related manager, and so adding .all is required to get a
+				queryset.
+			{% endcomment %}
+			{% for sub in this_user.submissions.all.order_by_like_count %}
 				{% if sub.contest.is_closed or user == this_user %}
 					{% if sub.id == highlight %}
 						<meta name="twitter:card" content="summary" />
@@ -46,7 +52,7 @@
 						<td>{{sub.submitted_by}}</td>
 						<td title="{{sub.likers.all|join:', '}}">
 							{% if not sub.contest.is_submissions %}
-								{{sub.likers.count}}
+								{{sub.like_count}}
 							{% else %}
 								Still open
 							{% endif %}

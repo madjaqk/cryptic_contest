@@ -15,7 +15,7 @@
 				{% if user.is_authenticated %}
 					Hello, <strong><a href="{% url 'cryptics:show_user' user.id %}">{{user}}</a></strong>! <a href="{% url 'account_logout' %}">Log out?</a>
 				{% else %}
-					<a href="{% url 'account_login' %}">Log in</a> to submit clues or contest words.
+					<a href="{% url 'account_login' %}?next={{ request.path }}">Log in</a> to submit clues or contest words.
 				{% endif %}
 			</div>
 		</div>

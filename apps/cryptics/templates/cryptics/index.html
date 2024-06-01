@@ -11,9 +11,9 @@ Puzzlers Club Cryptic Clue Contests
 	<h1>Cryptic Clue-Writing Contests</h1>
 
 	<h3>New Contest</h3>
-	<form action="{% url 'cryptics:create_contest' %}" method="post">
+	<form action="" method="post">
 		{% csrf_token %}
-		<p>Word: <input type="text" name="word" id="new_contest_word"> <a href="#" id="enumerate_link">Auto-enumerate</a> (beta)</p>
+		{{ form }}
 		<input type="submit" value="Create Contest">
 	</form>
 	<hr>
@@ -118,6 +118,5 @@ Puzzlers Club Cryptic Clue Contests
 	{% endif %}
 	<p><a href="{% url 'cryptics:all_closed_contests' %}">Full Archives</a></p>
 
-	<script type="text/javascript" src="{% static 'cryptics/js/enumerate.js' %}"></script>
 	<script type="text/javascript" src="{% static 'cryptics/js/click_to_reveal.js' %}"></script>
 {% endblock content %}

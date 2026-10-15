@@ -1,11 +1,13 @@
 from django.urls import path
 from . import views
+from .feeds import ContestFeed
 
 app_name = "cryptics"
 
 urlpatterns = [
 	path("", views.index, name="index"),
 	path("about", views.about, name="about"),
+	path("feed", ContestFeed(), name="feed"),
 	path("contest/<int:contest_id>", views.show_contest, name="show_contest"),
 	path("contest/<int:contest_id>-<word>", views.show_contest_full, name="show_contest_full"),
 	path("contest/search", views.contest_search_json, name="contest_search"),

@@ -4,12 +4,13 @@
 		<title>{% block title %}{% endblock title %}</title>
 		<meta charset="utf-8">
 		{% load static %}
+		<link rel="alternate" type="application/rss+xml" title="Puzzlers Club Cryptic Clue Contests" href="{% url 'cryptics:feed' %}">
 		<link rel="stylesheet" type="text/css" href="{% static 'cryptics/style.css' %}">
 	</head>
 	<body>
 		<div id="header">
 			<div id="header_links">
-				<a href="{% url 'cryptics:index' %}">Home</a> | <a href="{% url 'cryptics:about' %}">About</a> | <a href="{% url 'cryptics:all_users' %}">User Stats</a>
+				<a href="{% url 'cryptics:index' %}">Home</a> | <a href="{% url 'cryptics:about' %}">About</a> | <a href="{% url 'cryptics:all_users' %}">User Stats</a> | <a href="{% url 'cryptics:feed' %}">RSS</a>
 			</div>
 			<div id="header_login">
 				{% if user.is_authenticated %}
